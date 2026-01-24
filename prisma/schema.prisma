@@ -64,10 +64,9 @@ model Customer {
 }
 
 model SuperAdmin {
-  id         String @id @default(nanoid())
-  workerId   String
-  companyId  String
-  customerId String
+  id      String @id @default(nanoid())
+  email   String
+  clerkid String
 }
 
 model WorkerSchedule {

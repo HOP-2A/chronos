@@ -1,6 +1,19 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+const globalForPrisma = global as unknown as {
+  prisma: PrismaClient
 }
+
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+})
+
+const prisma = globalForPrisma.prisma || new PrismaClient({
+  adapter,
+  log: ['query', 'error', 'warn'],
+})
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+
+export default prisma

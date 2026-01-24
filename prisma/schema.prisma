@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  SUPERADMIN
+  COMPANY_ADMIN
+  WORKER
+  CUSTOMER
+}
+
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+model Company {
+  id            String   @id @default(nanoid())
+  name          String
+  typeOfCompany String
+  location      String
+  feedback      String
+  createdAt     DateTime @default(now())
+  day           Day
+  openTime      DateTime
+  closeTime     DateTime
+  users         User[]
+}
+
+model User {
+  id             String         @id @default(nanoid())
+  email          String         @unique
+  clerkId        String         @unique
+  name           String
+  experience     String
+  feedback       String
+  role           Role
+  workId         String
+  workerSchedule WorkerSchedule @relation(fields: [workId], references: [id])
+  companyId      String
+  company        Company        @relation(fields: [companyId], references: [id])
+}
+
+model Customer {
+  id      String @id @default(nanoid())
+  name    String
+  email   String @unique
+  clerkId String @unique
+}
+
+model SuperAdmin {
+  id         String @id @default(nanoid())
+  workerId   String
+  companyId  String
+  customerId String
+}
+
+model WorkerSchedule {
+  id        String   @id @default(nanoid())
+  workerId  String
+  day       Day
+  startTime DateTime
+  endTime   DateTime
+  users     User[]
+}

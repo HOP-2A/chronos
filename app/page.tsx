@@ -5,7 +5,7 @@ import { useState } from "react";
 const Page = () => {
   const [users, setUsers] = useState([]);
   const clerkUser = useUser();
-  console.log(clerkUser.user?.id, "aasdasd");
+  console.log(clerkUser.user?.id);
   const bringAllUsers = async () => {
     const res = await fetch("/api/user");
     const data = await res.json();

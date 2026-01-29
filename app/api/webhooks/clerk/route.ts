@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
@@ -22,55 +24,39 @@ export async function POST(req: Request) {
 
   try {
     evt = wh.verify(payload, svixHeaders) as UserWebhookEvent;
-  } catch {
+  } catch (err) {
+    console.error("Webhook verify failed", err);
     return new Response("Invalid signature", { status: 400 });
   }
 
-  const eventType = evt.type;
   const user = evt.data as UserJSON;
 
-  // schema-д nullable биш тул fallback өгнө
   const email =
-    user.email_addresses?.[0]?.email_address ?? `${user.id}@placeholder.com`;
+    user.email_addresses?.[0]?.email_address ?? `user_${user.id}@clerk.local`;
 
-  const name =
-    user.first_name || user.username || "Unnamed user";
+  const name = user.first_name || user.username || "Unnamed user";
 
-  const role: Role =
-    user.public_metadata?.isAdmin === true
-      ? Role.SUPERADMIN
-      : Role.USER;
+  const role =
+    user.public_metadata?.isAdmin === true ? Role.SUPERADMIN : Role.USER;
 
   try {
-    if (eventType === "user.created" || eventType === "user.updated") {
+    if (evt.type === "user.created" || evt.type === "user.updated") {
       await prisma.user.upsert({
         where: { clerkId: user.id },
-        update: {
-          email,
-          name,
-          role,
-        },
-        create: {
-          clerkId: user.id,
-          email,
-          name,
-          role,
-        },
+        update: { email, name, role },
+        create: { clerkId: user.id, email, name, role },
       });
     }
 
-    if (eventType === "user.deleted") {
-      await prisma.user.delete({
+    if (evt.type === "user.deleted") {
+      await prisma.user.deleteMany({
         where: { clerkId: user.id },
       });
     }
 
-    return new Response(
-      JSON.stringify({ received: true }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
+    return Response.json({ received: true });
   } catch (err) {
-    console.error("Webhook DB error:", err);
-    return new Response("Server error", { status: 500 });
+    console.error("Prisma error:", err);
+    return new Response("DB error", { status: 500 });
   }
 }

@@ -1,27 +1,24 @@
 import { prisma } from "@/lib/db";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 export async function GET(
-  req: NextRequest,
+  req: Request,
   context: { params: Promise<{ clerkId: string }> },
 ) {
   try {
     const { clerkId } = await context.params;
 
-    const customer = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { clerkId },
     });
 
-    if (!customer) {
-      return NextResponse.json(
-        { error: "Customer not found" },
-        { status: 404 },
-      );
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json(customer, { status: 200 });
-  } catch (error) {
-    console.error("GET customer error:", error);
+    return NextResponse.json(user);
+  } catch (err) {
+    console.error(err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

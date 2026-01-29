@@ -1,7 +1,10 @@
+export const runtime = "nodejs";
+
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
 import { UserJSON, UserWebhookEvent } from "@clerk/nextjs/server";
+import { Role } from "@prisma/client";
 
 export async function POST(req: Request) {
   const WH_SECRET = process.env.WH_SECRET;
@@ -17,48 +20,43 @@ export async function POST(req: Request) {
   };
 
   const wh = new Webhook(WH_SECRET);
-
   let evt: UserWebhookEvent;
 
   try {
     evt = wh.verify(payload, svixHeaders) as UserWebhookEvent;
-  } catch {
+  } catch (err) {
+    console.error("Webhook verify failed", err);
     return new Response("Invalid signature", { status: 400 });
   }
 
-  const eventType = evt.type;
   const user = evt.data as UserJSON;
+  console.log(user, "GHGGGGGG");
+  const email =
+    user.email_addresses?.[0]?.email_address ?? `user_${user.id}@clerk.local`;
 
-  const email = user.email_addresses?.[0]?.email_address || "";
-  const name = user.first_name || "Unnamed User";
-  const clerkId = user.id;
+  const name = user.first_name || user.username || "Unnamed user";
+
+  const role =
+    user.public_metadata?.isAdmin === true ? Role.SUPERADMIN : Role.USER;
 
   try {
-    if (eventType === "user.created" || eventType === "user.updated") {
+    if (evt.type === "user.created" || evt.type === "user.updated") {
       await prisma.user.upsert({
-        where: { clerkId },
-        update: {
-          email,
-          name,
-        },
-        create: {
-          clerkId,
-          email,
-          name,
-          role: "USER",
-        },
+        where: { clerkId: user.id },
+        update: { email, name, role },
+        create: { clerkId: user.id, email, name, role },
       });
     }
 
-    if (eventType === "user.deleted") {
-      await prisma.user.delete({
-        where: { clerkId },
+    if (evt.type === "user.deleted") {
+      await prisma.user.deleteMany({
+        where: { clerkId: user.id },
       });
     }
 
-    return new Response(JSON.stringify({ received: true }), { status: 200 });
+    return Response.json({ received: true });
   } catch (err) {
-    console.error("Customer webhook error:", err);
-    return new Response("Server error", { status: 500 });
+    console.error("Prisma error:", err);
+    return new Response("DB error", { status: 500 });
   }
 }

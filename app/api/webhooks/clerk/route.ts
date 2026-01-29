@@ -2,6 +2,7 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
 import { UserJSON, UserWebhookEvent } from "@clerk/nextjs/server";
+import { Role } from "@prisma/client";
 
 export async function POST(req: Request) {
   const WH_SECRET = process.env.WH_SECRET;
@@ -17,7 +18,6 @@ export async function POST(req: Request) {
   };
 
   const wh = new Webhook(WH_SECRET);
-
   let evt: UserWebhookEvent;
 
   try {
@@ -29,36 +29,48 @@ export async function POST(req: Request) {
   const eventType = evt.type;
   const user = evt.data as UserJSON;
 
-  const email = user.email_addresses?.[0]?.email_address || "";
-  const name = user.first_name || "Unnamed User";
-  const clerkId = user.id;
+  // schema-д nullable биш тул fallback өгнө
+  const email =
+    user.email_addresses?.[0]?.email_address ?? `${user.id}@placeholder.com`;
+
+  const name =
+    user.first_name || user.username || "Unnamed user";
+
+  const role: Role =
+    user.public_metadata?.isAdmin === true
+      ? Role.SUPERADMIN
+      : Role.USER;
 
   try {
     if (eventType === "user.created" || eventType === "user.updated") {
       await prisma.user.upsert({
-        where: { clerkId },
+        where: { clerkId: user.id },
         update: {
           email,
           name,
+          role,
         },
         create: {
-          clerkId,
+          clerkId: user.id,
           email,
           name,
-          role: "USER",
+          role,
         },
       });
     }
 
     if (eventType === "user.deleted") {
       await prisma.user.delete({
-        where: { clerkId },
+        where: { clerkId: user.id },
       });
     }
 
-    return new Response(JSON.stringify({ received: true }), { status: 200 });
+    return new Response(
+      JSON.stringify({ received: true }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
   } catch (err) {
-    console.error("Customer webhook error:", err);
+    console.error("Webhook DB error:", err);
     return new Response("Server error", { status: 500 });
   }
 }

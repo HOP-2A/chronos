@@ -1,79 +1,102 @@
 "use client";
 
-import React, { use, useState } from "react";
+import { useParams } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
-export default function Page({
-  params,
-}: {
-  params: Promise<{ workerId: string }>;
-}) {
-  const { workerId } = use(params);
+type DayOption =
+  | "MONDAY"
+  | "TUESDAY"
+  | "WEDNESDAY"
+  | "THURSDAY"
+  | "FRIDAY"
+  | "SATURDAY"
+  | "SUNDAY";
 
-  const [day, setDay] = useState("MONDAY");
+export default function Page() {
+  const params = useParams();
+  const workerId = params.workerId;
+
+  const [day, setDay] = useState<DayOption>("MONDAY");
   const [startTime, setStartTime] = useState("09:00");
-  const [endTime, setEndTime] = useState("10:00");
-  const [companyId, setCompanyId] = useState("");
+  const [endTime, setEndTime] = useState("17:00");
+  const [loading, setLoading] = useState(false);
 
-  const weekDays = [
-    "MONDAY",
-    "TUESDAY",
-    "WEDNESDAY",
-    "THURSDAY",
-    "FRIDAY",
-    "SATURDAY",
-    "SUNDAY",
-  ];
+  const createSchedule = async () => {
+    if (!workerId) {
+      toast.error("Worker ID missing");
+      return;
+    }
 
-  const submitHandler = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const today = new Date().toISOString().split("T")[0];
-    const startDateTime = `${today}T${startTime}:00.000Z`;
-    const endDateTime = `${today}T${endTime}:00.000Z`;
+    if (startTime >= endTime) {
+      toast.error("End time must be later than start time");
+      return;
+    }
 
-    const res = await fetch(`/api/worker/${workerId}`, {
+    setLoading(true);
+
+    const res = await fetch("/api/worker", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         day,
-        startTime: startDateTime,
-        endTime: endDateTime,
+        startTime,
+        endTime,
         workerId,
-        companyId,
       }),
     });
+
+    setLoading(false);
+
+    if (res.status === 201) {
+      toast.success("Schedule created successfully");
+    } else if (res.status === 409) {
+      toast.error("Schedule already exists");
+    } else {
+      toast.error("Failed to create schedule");
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-zinc-900 to-black text-cyan-300">
-      <div className="w-full max-w-md rounded-2xl border border-cyan-500/30 bg-black/60 backdrop-blur-xl shadow-[0_0_40px_rgba(34,211,238,0.25)] p-8">
-        <h1 className="text-2xl font-bold tracking-widest text-center mb-6 text-cyan-400">
-          WORKER SCHEDULER
-        </h1>
-
-        <form onSubmit={submitHandler} className="space-y-5">
+    <div className="min-h-screen flex items-center justify-center bg-[#0b1220]">
+      <div className="max-w-xl w-full rounded-2xl p-8 space-y-8 bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_rgba(99,102,241,0.25)]">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <label className="text-xs uppercase tracking-widest text-cyan-500">
-              Company ID
-            </label>
-            <input
-              value={companyId}
-              onChange={(e) => setCompanyId(e.target.value)}
-              className="w-full mt-1 bg-black border border-cyan-500/40 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-cyan-500"
-              placeholder="company id"
-              required
-            />
+            <h2 className="text-2xl font-semibold text-white">
+              Add Worker Schedule
+            </h2>
+            <p className="text-sm text-slate-300 mt-1">
+              Add a time slot for this worker
+            </p>
           </div>
 
+          <button
+            onClick={() => window.history.back()}
+            className="px-3 py-1.5 text-sm rounded-lg border border-white/20 text-slate-300 hover:bg-white/10 transition"
+          >
+            ← Back
+          </button>
+        </div>
+
+        <div className="space-y-6">
           <div>
-            <label className="text-xs uppercase tracking-widest text-cyan-500">
-              Day
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Weekday
             </label>
             <select
               value={day}
-              onChange={(e) => setDay(e.target.value)}
-              className="w-full mt-1 bg-black border border-cyan-500/40 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-cyan-500 text-cyan-300"
+              onChange={(e) => setDay(e.target.value as DayOption)}
+              className="w-full rounded-xl px-4 py-3 bg-white/10 border border-white/20 text-slate-200 text-sm backdrop-blur-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
             >
-              {weekDays.map((d) => (
+              {[
+                "MONDAY",
+                "TUESDAY",
+                "WEDNESDAY",
+                "THURSDAY",
+                "FRIDAY",
+                "SATURDAY",
+                "SUNDAY",
+              ].map((d) => (
                 <option key={d} value={d}>
                   {d}
                 </option>
@@ -81,35 +104,42 @@ export default function Page({
             </select>
           </div>
 
-          <div>
-            <label className="text-xs uppercase tracking-widest text-cyan-500">
-              Start Time
-            </label>
-            <input
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              className="w-full mt-1 bg-black border border-cyan-500/40 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Start Time
+              </label>
+              <input
+                type="time"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                className="w-full rounded-xl px-4 py-3 bg-white/10 border border-white/20 text-slate-200 text-sm backdrop-blur-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+              />
+            </div>
 
-          <div>
-            <label className="text-xs uppercase tracking-widest text-cyan-500">
-              End Time
-            </label>
-            <input
-              type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              className="w-full mt-1 bg-black border border-cyan-500/40 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-cyan-500"
-            />
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                End Time
+              </label>
+              <input
+                type="time"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                className="w-full rounded-xl px-4 py-3 bg-white/10 border border-white/20 text-slate-200 text-sm backdrop-blur-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+              />
+            </div>
           </div>
+        </div>
 
+        <div className="pt-4 border-t border-white/10">
           <button
-            type="submit"
-            className="w-full mt-4 py-3 rounded-xl font-semibold tracking-widest bg-cyan-500 text-black hover:bg-cyan-400 transition shadow-[0_0_20px_rgba(34,211,238,0.6)] disabled:opacity-50"
-          ></button>
-        </form>
+            onClick={createSchedule}
+            disabled={loading}
+            className="w-full rounded-xl py-3 text-sm font-semibold text-white bg-indigo-500/30 border border-indigo-400/30 hover:bg-indigo-500/50 transition shadow-[0_0_25px_rgba(99,102,241,0.4)]"
+          >
+            {loading ? "Saving..." : "Save Schedule"}
+          </button>
+        </div>
       </div>
     </div>
   );

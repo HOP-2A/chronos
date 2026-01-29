@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   }
 
   const user = evt.data as UserJSON;
-
+  console.log(user, "GHGGGGGG");
   const email =
     user.email_addresses?.[0]?.email_address ?? `user_${user.id}@clerk.local`;
 

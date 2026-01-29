@@ -33,12 +33,15 @@ model Company {
   typeOfCompany String
   location      String?
   feedback      String?
-  workers       Worker[]
-  createdBy     Admin[]
   createdAt     DateTime  @default(now())
   openTime      DateTime?
   closeTime     DateTime?
-  users         User[]
+
+  ownerId String
+  owner   Admin  @relation(fields: [ownerId], references: [id])
+
+  workers Worker[]
+  users   User[]
 }
 
 model Worker {
@@ -63,12 +66,12 @@ model User {
 }
 
 model Admin {
-  id          String   @id @default(nanoid())
+  id          String  @id @default(nanoid())
   name        String
-  email       String   @unique
+  email       String  @unique
   phoneNumber String?
-  companies   Company? @relation(fields: [companyId], references: [id])
-  companyId   String?
+
+  companies Company[]
 }
 
 model TimeSchedule {

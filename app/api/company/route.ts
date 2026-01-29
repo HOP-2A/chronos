@@ -2,9 +2,25 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const { name, typeOfCompany, location, feedback, openTime, closeTime } =
-    await req.json();
-  const createdCompany = await prisma.company.create({
+  const {
+    name,
+    typeOfCompany,
+    location,
+    feedback,
+    openTime,
+    closeTime,
+    ownerId,
+  } = await req.json();
+
+  const admin = await prisma.admin.findUnique({
+    where: { id: ownerId },
+  });
+
+  if (!admin) {
+    return new NextResponse("admin not found", { status: 404 });
+  }
+
+  const company = await prisma.company.create({
     data: {
       name,
       typeOfCompany,
@@ -12,12 +28,12 @@ export async function POST(req: Request) {
       feedback,
       openTime,
       closeTime,
+      owner: {
+        connect: { id: ownerId },
+      },
     },
+    include: { owner: true },
   });
-  return NextResponse.json(createdCompany);
-}
 
-export async function GET() {
-  const allCompanies = await prisma.company.findMany({});
-  return NextResponse.json(allCompanies);
+  return NextResponse.json(company);
 }

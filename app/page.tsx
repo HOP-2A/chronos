@@ -1,11 +1,13 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const Page = () => {
   const [users, setUsers] = useState([]);
   const clerkUser = useUser();
+  const { push } = useRouter();
   const bringAllUsers = async () => {
     const res = await fetch("/api/user");
     const data = await res.json();
@@ -28,8 +30,16 @@ const Page = () => {
       >
         Chronos
       </div>
-      <div className="flex justify-center">
-        <Button variant="ghost" className="bg-pink-400 text-white hover:bg-purple-300 hover:text-white cursor-pointer">
+      <div
+        className="flex justify-center"
+        onClick={() => {
+          push("/dashboard.user");
+        }}
+      >
+        <Button
+          variant="ghost"
+          className="bg-pink-400 text-white hover:bg-purple-300 hover:text-white cursor-pointer"
+        >
           Get started
         </Button>
       </div>

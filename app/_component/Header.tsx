@@ -1,3 +1,5 @@
+"use client";
+import { Button } from "@/components/ui/button";
 import {
   SignInButton,
   SignUpButton,
@@ -5,21 +7,30 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
+import { useState } from "react";
 
 const Header = () => {
+  const [scrolled, setScrolled] = useState(false);
+
   return (
-    <header className="bg-black flex justify-end items-center p-4 gap-4 h-16">
-      <div>
+    <header
+      className={`flex items-center justify-emd w-full fixed top-0 z-50 transition-colors duration-300 rounded-b-2xl ${
+        scrolled ? "bg-[#2e5d4d] shadow" : "bg-transparent"
+      }`}
+    >
+      <div className="mr-5 flex justify-end">
         <SignedOut>
-          <SignInButton />
           <SignUpButton>
-            <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
-              Sign Up
-            </button>
+            <Button
+              variant="ghost"
+              className="bg-pink-400 text-white hover:bg-purple-300 hover:text-white cursor-pointer "
+            >
+              Нэвтрэх
+            </Button>
           </SignUpButton>
         </SignedOut>
         <SignedIn>
-          <UserButton />
+          <UserButton />  
         </SignedIn>
       </div>
     </header>

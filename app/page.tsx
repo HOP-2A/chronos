@@ -33,7 +33,7 @@ const Page = () => {
       <div
         className="flex justify-center"
         onClick={() => {
-          push("/dashboard.user");
+          push("/dashboard");
         }}
       >
         <Button

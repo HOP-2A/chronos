@@ -37,3 +37,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json("failed", { status: 404 });
   }
 }
+
+export const GET = async () => {
+  const allworkers = await prisma.worker.findMany();
+  return NextResponse.json(allworkers);
+};

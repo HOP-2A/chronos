@@ -1,7 +1,8 @@
 "use client";
 
 import Sidebar from "@/app/_component/sidebar";
-import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export type UserType = {
@@ -26,22 +27,16 @@ type CompanyType = {
 const Page = () => {
   const params = useParams();
   const userId = params.userId;
-  const [getUser, setGetUser] = useState<UserType>();
-  const [company, setCompany] = useState<CompanyType>();
-  const [worker, setWorker] = useState();
-
-  const workerGet = async () => {
-    const response = await fetch("/api/worker");
-    const res = await response.json();
-    setWorker(res);
-  };
+  const [getUser, setGetUser] = useState<UserType[]>([]);
+  const [company, setCompany] = useState<CompanyType[]>([]);
+  const { push } = useRouter();
 
   const companyGet = async () => {
     const response = await fetch("/api/company");
     const res = await response.json();
     setCompany(res);
   };
-  console.log(company);
+  console.log(company.map((com) => com.id));
 
   useEffect(() => {
     const userGet = async () => {
@@ -51,7 +46,6 @@ const Page = () => {
     };
     userGet();
     companyGet();
-    workerGet();
   }, []);
   return (
     <div className="flex min-h-screen bg-black">
@@ -59,11 +53,24 @@ const Page = () => {
       <main className="flex-1 p-10 text-white">
         <h1 className="text-3xl font-bold mb-6">Welcome! User</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-zinc-900 rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-2">Account Info</h3>
-            <p className="text-zinc-400">User ID: {params.userId}</p>
-          </div>
+          <div>
+            {company.map((company) => {
+              return (
+                <div key={company.id}>
+                  <h3 className="text-lg font-semibold mb-2">Company</h3>
 
+                  <p className="text-zinc-400"></p>
+                  <Button
+                    onClick={() => {
+                      push(`/organization/${company.id}`);
+                    }}
+                  >
+                    Ochih
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
           <div className="bg-zinc-900 rounded-xl p-6">
             <h3 className="text-lg font-semibold mb-2">Activity</h3>
             <p className="text-zinc-400">No recent activity</p>

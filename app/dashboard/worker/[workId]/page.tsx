@@ -2,15 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-
-export type UserType = {
-  id: String;
-  name: string;
-  email: string;
-  role: string;
-  clerkId: string;
-  companyId: string;
-};
+import { UserType } from "../../user/[userId]/page";
 
 const Page = () => {
   const params = useParams();

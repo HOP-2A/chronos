@@ -36,7 +36,6 @@ const Page = () => {
     const res = await response.json();
     setCompany(res);
   };
-  console.log(company.map((com) => com.id));
 
   useEffect(() => {
     const userGet = async () => {

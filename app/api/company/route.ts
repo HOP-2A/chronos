@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const { name, typeOfCompany, location, feedback, openTime, closeTime } =
@@ -21,4 +21,11 @@ export async function GET() {
   const allCompanies = await prisma.company.findMany();
   console.log(allCompanies);
   return NextResponse.json(allCompanies);
-} 
+}
+export async function DELETE(req: NextRequest) {
+  const findCom = await prisma.company.findUnique();
+  const delComp = await prisma.company.delete({
+    where: { id: companyId },
+  });
+  return NextResponse.json({ success: true });
+}

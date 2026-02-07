@@ -46,7 +46,7 @@ export default function CreateWorkerPage() {
     e.preventDefault();
 
     if (!userId) {
-      toast.error("User not loaded yet!");
+      toast.error("User avjiin");
       return;
     }
 
@@ -85,7 +85,6 @@ export default function CreateWorkerPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA] p-6">
       <Toaster />
-
       <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-sm border border-gray-100">
         <header className="mb-8">
           <h1 className="text-xl font-medium text-gray-900">New Worker</h1>
@@ -103,7 +102,7 @@ export default function CreateWorkerPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@company.com"
+              placeholder="your gmail"
               className="w-full p-3 rounded-lg border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
               required
             />
@@ -111,13 +110,13 @@ export default function CreateWorkerPage() {
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
-              Full Name
+              Your Name (can be a nickname)
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="John Doe"
+              placeholder="Your name"
               className="w-full p-3 rounded-lg border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
               required
             />
@@ -144,7 +143,7 @@ export default function CreateWorkerPage() {
               type="text"
               value={experience.join(",")}
               onChange={(e) => setExperience(e.target.value.split(","))}
-              placeholder="React, Node.js, Design"
+              placeholder="your work experience"
               className="w-full p-3 rounded-lg border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-black transition"
             />
           </div>

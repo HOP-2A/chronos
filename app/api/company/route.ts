@@ -22,10 +22,3 @@ export async function GET() {
   console.log(allCompanies);
   return NextResponse.json(allCompanies);
 }
-export async function DELETE(req: NextRequest) {
-  const findCom = await prisma.company.findUnique();
-  const delComp = await prisma.company.delete({
-    where: { id: companyId },
-  });
-  return NextResponse.json({ success: true });
-}

@@ -29,14 +29,14 @@ enum Day {
 }
 
 model Company {
-  id            String    @id @default(nanoid())
+  id            String         @id @default(nanoid())
   name          String
   typeOfCompany String
   location      String?
   feedback      String?
   workers       Worker[]
   createdBy     Admin[]
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime       @default(now())
   openTime      DateTime?
   closeTime     DateTime?
   users         User[]
@@ -78,12 +78,10 @@ model Admin {
 }
 
 model TimeSchedule {
-  id        String   @id @default(nanoid())
+  id        String     @id @default(nanoid())
   day       Day
-  startTime String
-  endTime   String
-  workerId  String
-  worker    Worker   @relation(fields: [workerId], references: [id])
+  startTime DateTime[]
+  endTime   DateTime[]
+  company   Company?   @relation(fields: [companyId], references: [id])
   companyId String?
-  company   Company? @relation(fields: [companyId], references: [id])
 }

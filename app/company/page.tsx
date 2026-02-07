@@ -25,7 +25,7 @@ const Page = () => {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     getCompanies();
-  }, []) 
+  }, []);
   return (
     <div className="min-h-screen flex flex-col bg-[#000000]">
       <div className="flex justify-center pt-6">

@@ -19,6 +19,5 @@ export async function POST(req: Request) {
 
 export async function GET() {
   const allCompanies = await prisma.company.findMany();
-  console.log(allCompanies);
   return NextResponse.json(allCompanies);
 }

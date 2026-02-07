@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { UserType } from "../../user/[userId]/page";
 
 type DayOption =
   | "MONDAY"
@@ -24,11 +25,18 @@ type Schedule = {
 export default function Page() {
   const params = useParams();
   const workerId = String(params.workerId);
+  const [getUser, setGetUser] = useState<UserType>();
 
   const [day, setDay] = useState<DayOption>("MONDAY");
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("17:00");
   const [workerSchedule, setWorkerSchedule] = useState<Schedule[]>([]);
+
+  const userGet = async () => {
+    const response = await fetch(`/api/worker/${workerId}`);
+    const res = await response.json();
+    setGetUser(res);
+  };
 
   const createSchedule = async () => {
     const res = await fetch("/api/worker", {
@@ -56,6 +64,7 @@ export default function Page() {
   };
 
   useEffect(() => {
+    userGet();
     if (workerId) getWorkerSchedule(workerId);
   }, [workerId]);
 

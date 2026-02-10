@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
 import {
   Card,
-  CardAction,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -34,9 +33,7 @@ const Page = () => {
   const [company, setCompany] = useState<CompanyInfo>([]);
   const { push } = useRouter();
   const getCompanies = async () => {
-    const res = await fetch(`/api/company`, {
-      method: "GET",
-    });
+    const res = await fetch("/api/company");
     if (!res.ok) {
       throw new Error("Failed to fetch companies");
     }
@@ -55,7 +52,6 @@ const Page = () => {
     });
   };
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     getCompanies();
   }, []);
     return (

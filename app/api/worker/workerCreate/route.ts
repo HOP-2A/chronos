@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   });
 
   if (!existingWorker) {
-    const worker = await prisma.worker.create({
+    const createdWorker = await prisma.worker.create({
       data: {
         email,
         clerkId: user.clerkId,
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
         companyId,
       },
     });
-    return NextResponse.json(worker, { status: 200 });
+    return NextResponse.json(createdWorker, { status: 200 });
   } else {
     return NextResponse.json({ error: "Worker bainaa" }, { status: 404 });
   }

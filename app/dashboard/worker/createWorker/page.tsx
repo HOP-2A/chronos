@@ -153,14 +153,14 @@ export default function CreateWorkerPage() {
             />
           </div>
 
-            <button
-              onClick={handleSubmit}
-              className="w-full mt-4 py-3 px-4 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors shadow-sm"
-            >
-              Create Worker
-            </button>
-          </div>
+          <button
+            onClick={handleSubmit}
+            className="w-full mt-4 py-3 px-4 bg-white text-black text-sm font-bold rounded-lg hover:bg-gray-200 transition-all active:scale-[0.98] shadow-lg shadow-white/5"
+          >
+            Create Worker
+          </button>
         </div>
       </div>
+    </div>
   );
 }

@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "User olqsongua" }, { status: 404 });
   }
 
-  const existingWorker = await prisma.worker.findFirst({
+  const existingWorker = await prisma.worker.findUnique({
     where: { clerkId: user.clerkId },
   });
 
@@ -26,9 +26,9 @@ export async function POST(req: Request) {
         clerkId: user.clerkId,
         name,
         phoneNumber,
-        experience: experience ?? [],
-        feedback: feedback ?? [],
-        companyId: companyId ?? null,
+        experience,
+        feedback,
+        companyId,
       },
     });
     return NextResponse.json(worker, { status: 200 });

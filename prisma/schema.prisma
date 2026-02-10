@@ -84,4 +84,6 @@ model TimeSchedule {
   endTime   DateTime[]
   company   Company?   @relation(fields: [companyId], references: [id])
   companyId String?
+
+  workers Worker[]
 }

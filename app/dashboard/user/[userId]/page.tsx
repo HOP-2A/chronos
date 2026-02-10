@@ -13,7 +13,7 @@ export type UserType = {
   clerkId: string;
   companyId: string;
 };
-type CompanyType = {
+export type CompanyType = {
   closeTime: string;
   createdAt: Date;
   feedback: string;

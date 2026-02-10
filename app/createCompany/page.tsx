@@ -1,11 +1,7 @@
-/* eslint-disable react/jsx-no-undef */
 "use client";
 
-import { useState, useEffect } from "react";
-
-import * as React from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-
 import { Input } from "@/components/ui/input";
 
 const Page = () => {
@@ -13,45 +9,65 @@ const Page = () => {
     name: "",
     typeOfCompany: "",
     location: "",
-
-    workers: [
+    workers: [],
+    timeSchedules: [
       {
-        email: "",
-        name: "",
-        phoneNumber: "",
-        experience: [],
-        feedback: [],
+        day: "Monday",
+        startTime: "",
+        endTime: "",
       },
     ],
-
-    timeSchedules: [{ day: "", startTime: [], endTime: [] }],
   });
-  const handleInputValue = (e: { target: { name: any; value: any } }) => {
+
+  const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     if (name === "companyName") {
-      setInfo({ ...info, name: value });
+      setInfo((prev) => ({ ...prev, name: value }));
     }
+
     if (name === "companyType") {
-      setInfo({ ...info, typeOfCompany: value });
+      setInfo((prev) => ({ ...prev, typeOfCompany: value }));
     }
+
     if (name === "location") {
-      setInfo({ ...info, location: value });
+      setInfo((prev) => ({ ...prev, location: value }));
     }
+
     if (name === "openTime") {
-      setInfo({ ...info, startTime: value });
+      setInfo((prev) => ({
+        ...prev,
+        timeSchedules: [
+          {
+            ...prev.timeSchedules[0],
+            startTime: value,
+          },
+        ],
+      }));
     }
+
     if (name === "closeTime") {
-      setInfo({ ...info, endTime: value });
+      setInfo((prev) => ({
+        ...prev,
+        timeSchedules: [
+          {
+            ...prev.timeSchedules[0],
+            endTime: value,
+          },
+        ],
+      }));
     }
   };
+
   const createCompany = async () => {
     const res = await fetch("api/company", {
       method: "POST",
-      headers: { "Content-type": "application/json" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(info),
     });
+
     const data = await res.json();
-    setInfo(data);
+    console.log("Created company:", data);
   };
 
   return (
@@ -74,8 +90,8 @@ const Page = () => {
           <Input
             name="companyType"
             onChange={handleInputValue}
-            placeholder="service type"
-            className="mt-1  text-white"
+            placeholder="Service type"
+            className="mt-1 text-white"
           />
         </label>
 
@@ -85,33 +101,37 @@ const Page = () => {
             name="location"
             onChange={handleInputValue}
             placeholder="City or address"
-            className="mt-1  text-white"
+            className="mt-1 text-white"
           />
         </label>
 
-        <label className="flex flex-col">
-          open time{" "}
-          <Input
-            name="openTime"
-            onChange={handleInputValue}
-            className="h-[40px] w-[100px]"
-          ></Input>
-        </label>
+        <div className="flex gap-4">
+          <label className="flex flex-col">
+            Open time
+            <Input
+              name="openTime"
+              onChange={handleInputValue}
+              placeholder="09:00"
+              className="h-[40px] w-[120px]"
+            />
+          </label>
 
-        <label className="flex flex-col">
-          close time
-          <Input
-            name="closeTime"
-            onChange={handleInputValue}
-            className="h-[40px] w-[100px]"
-          ></Input>
-        </label>
+          <label className="flex flex-col">
+            Close time
+            <Input
+              name="closeTime"
+              onChange={handleInputValue}
+              placeholder="18:00"
+              className="h-[40px] w-[120px]"
+            />
+          </label>
+        </div>
 
         <Button
-          className="mt-4 bg-white text-black hover:bg-gray-200"
+          className="mt-6 bg-white text-black hover:bg-gray-200"
           onClick={createCompany}
         >
-          send
+          Send
         </Button>
       </div>
     </div>

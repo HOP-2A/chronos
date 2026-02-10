@@ -61,7 +61,7 @@ const Page = () => {
                   <p className="text-zinc-400"></p>
                   <Button
                     onClick={() => {
-                      push(`/organization/${company.id}`);
+                      push(`/company/${company.id}`);
                     }}
                   >
                     Ochih

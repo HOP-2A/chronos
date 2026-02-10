@@ -1,11 +1,13 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { toast, Toaster } from "sonner";
 
 export default function CreateWorkerPage() {
   const { user } = useUser();
+  const { push } = useRouter();
 
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -83,7 +85,7 @@ export default function CreateWorkerPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA] p-6">
+    <div className="min-h-screen flex items-center justify-center   p-6 bg-black">
       <Toaster />
       <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-sm border border-gray-100">
         <header className="mb-8">
@@ -148,12 +150,18 @@ export default function CreateWorkerPage() {
             />
           </div>
 
-          <button
-            onClick={handleSubmit}
-            className="w-full mt-4 py-3 px-4 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors shadow-sm"
+          <div
+            onClick={() => {
+              push(`/dashboard/worker/${user?.id}`);
+            }}
           >
-            Create Worker
-          </button>
+            <button
+              onClick={handleSubmit}
+              className="w-full mt-4 py-3 px-4 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors shadow-sm"
+            >
+              Create Worker
+            </button>
+          </div>
         </div>
       </div>
     </div>

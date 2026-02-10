@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { UserType } from "../../user/[userId]/page";
+import { useRouter } from "next/navigation";
 
 type DayOption =
   | "MONDAY"
@@ -26,6 +27,7 @@ export default function Page() {
   const params = useParams();
   const workerId = String(params.workerId);
   const [getUser, setGetUser] = useState<UserType>();
+  const { push } = useRouter();
 
   const [day, setDay] = useState<DayOption>("MONDAY");
   const [startTime, setStartTime] = useState("09:00");
@@ -142,7 +144,12 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-white/10">
+          <div
+            className="pt-4 border-t border-white/10"
+            onClick={() => {
+              push(`/dashboard/worker/profile/${workerId}`);
+            }}
+          >
             <button
               onClick={createSchedule}
               className="w-full rounded-xl py-3 text-sm font-semibold text-white bg-indigo-500/30 border border-indigo-400/30 hover:bg-indigo-500/50 transition shadow-[0_0_25px_rgba(99,102,241,0.4)]"

@@ -16,14 +16,14 @@ export async function POST(req: Request) {
   }
 
   const existingWorker = await prisma.worker.findUnique({
-    where: { clerkId: user.clerkId },
+    where: { id: user.clerkId },
   });
 
   if (!existingWorker) {
     const worker = await prisma.worker.create({
       data: {
         email,
-        clerkId: user.clerkId,
+        id: user.clerkId,
         name,
         phoneNumber,
         experience,

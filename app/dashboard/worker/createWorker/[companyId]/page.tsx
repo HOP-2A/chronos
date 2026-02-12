@@ -1,58 +1,22 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { useState } from "react";
 import { toast, Toaster } from "sonner";
 
 export default function CreateWorkerPage() {
-  const { user } = useUser();
-  const { push } = useRouter();
+  const params = useParams();
+  const companyId = String(params.companyId);
 
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [experience, setExperience] = useState<string[]>([]);
-  const [userId, setUserId] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  const fetchUser = async () => {
-    if (!user?.id) return;
-
-    const res = await fetch(`/api/user/${user.id}`);
-
-    if (!res.ok) {
-      toast.error("Failed to fetch user");
-      setLoading(false);
-      return;
-    }
-    const data = await res.json();
-
-    if (data.error) {
-      toast.error("fetch failed", data.error);
-      setLoading(false);
-    } else {
-      setUserId(data.id);
-      setName(data.name);
-      setEmail(data.email);
-    }
-
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchUser();
-  }, [user?.id]);
+  const [experience, setExperience] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!userId) {
-      toast.error("User avjiin");
-      return;
-    }
-
-    const res = await fetch("/api/worker/workerCreate", {
+    const res = await fetch(`/api/worker/createWorker/${companyId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -60,7 +24,7 @@ export default function CreateWorkerPage() {
         name,
         phoneNumber,
         experience,
-        userId,
+        status: "PENDING",
       }),
     });
 
@@ -69,20 +33,12 @@ export default function CreateWorkerPage() {
       setEmail("");
       setName("");
       setPhoneNumber("");
-      setExperience([]);
+      setExperience("");
     } else {
       toast.error("Failed to create worker");
       return;
     }
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <p className="text-gray-400 animate-pulse">Loading...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0A0A0A] p-4 sm:p-6 text-gray-100">
@@ -132,7 +88,7 @@ export default function CreateWorkerPage() {
               Phone Number
             </label>
             <input
-              type="text"
+              type="number"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="+1 (555) 000-0000"
@@ -146,19 +102,21 @@ export default function CreateWorkerPage() {
             </label>
             <input
               type="text"
-              value={experience.join(",")}
-              onChange={(e) => setExperience(e.target.value.split(","))}
+              value={experience}
+              onChange={(e) => setExperience(e.target.value)}
               placeholder="React, Design, Management"
               className="w-full p-3 rounded-lg border border-white/[0.05] bg-white/[0.02] text-gray-200 placeholder:text-gray-700 focus:outline-none focus:ring-1 focus:ring-white/20 transition-all text-sm"
             />
           </div>
 
-          <button
-            onClick={handleSubmit}
-            className="w-full mt-4 py-3 px-4 bg-white text-black text-sm font-bold rounded-lg hover:bg-gray-200 transition-all active:scale-[0.98] shadow-lg shadow-white/5"
-          >
-            Create Worker
-          </button>
+          <div>
+            <button
+              onClick={handleSubmit}
+              className="w-full mt-4 py-3 px-4 bg-white text-black text-sm font-bold rounded-lg hover:bg-gray-200 transition-all active:scale-[0.98] shadow-lg shadow-white/5"
+            >
+              Send Request Succesfully
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -49,7 +49,7 @@ const Page = () => {
             </div>
             <button
               onClick={() => {
-                push("/dashboard/worker/createWorker");
+                push(`/dashboard/worker/createWorker/${com.id}`);
               }}
               className="w-full mt-6 py-3 rounded-xl  bg-black text-white font-medium hover:bg-gray-800 transition"
             >

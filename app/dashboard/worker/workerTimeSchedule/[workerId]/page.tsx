@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { UserType } from "../../user/[userId]/page";
+import { UserType } from "../../../user/[userId]/page";
 import { useRouter } from "next/navigation";
 
 type DayOption =

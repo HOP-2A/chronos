@@ -28,6 +28,12 @@ enum Day {
   SUNDAY
 }
 
+enum WorkerRequest {
+  PENDING
+  REJECTED
+  ACCEPTED
+}
+
 model Company {
   id            String    @id @default(nanoid())
   name          String
@@ -48,12 +54,13 @@ model Company {
 model Worker {
   id            String         @id @default(nanoid())
   email         String         @unique
-  clerkId       String         @unique
+  clerkId       String?        @unique
   name          String
   phoneNumber   String?
-  experience    String[]
+  experience    String
   feedback      String[]
   companyId     String?
+  status        WorkerRequest  @default(PENDING)
   company       Company?       @relation(fields: [companyId], references: [id])
   timeSchedules TimeSchedule[]
 }

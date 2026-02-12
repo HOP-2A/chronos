@@ -10,8 +10,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useEffect, useState } from "react";
+import { CompanyType } from "../dashboard/user/[userId]/page";
 const Page = () => {
-  const [company, setCompany] = useState([]);
+  const [company, setCompany] = useState<CompanyType[]>([]);
   const getCompanies = async () => {
     const res = await fetch(`/api/company`, {
       method: "GET",

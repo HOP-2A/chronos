@@ -8,7 +8,7 @@ export const GET = async (
   const { workerId } = await context.params;
   try {
     const user = await prisma.worker.findUnique({
-      where: { clerkId: workerId },
+      where: { id: workerId },
     });
 
     if (!user) {

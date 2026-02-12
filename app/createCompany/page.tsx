@@ -1,7 +1,6 @@
 "use client";
 
-import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,65 +43,40 @@ export default function Page() {
     workers: [
       { email: "", name: "", phoneNumber: "", experience: [], feedback: [] },
     ],
+
+    timeSchedules: [{ day: "", openTime: [], Time: [] }],
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setInfo((prev) => {
-      if (name === "companyName") return { ...prev, name: value };
-      if (name === "companyType") return { ...prev, typeOfCompany: value };
-      if (name === "location") return { ...prev, location: value };
-      return prev;
-    });
-  };
-
-  const createCompany = async () => {
-    try {
-      setIsSubmitting(true);
-      const payload = {
-        ...info,
-        openTime: info.openTime ? info.openTime.toISOString() : null,
-        closeTime: info.closeTime ? info.closeTime.toISOString() : null,
-      };
-
-      const res = await fetch("/api/company", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
-      const data = await res.json();
-
-      setInfo((prev) => ({
-        ...prev,
-        ...data,
-        openTime: data.openTime ? new Date(data.openTime) : null,
-        closeTime: data.closeTime ? new Date(data.closeTime) : null,
-      }));
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
+    if (name === "companyName") {
+      setInfo({ ...info, name: value });
+    }
+    if (name === "companyType") {
+      setInfo({ ...info, typeOfCompany: value });
+    }
+    if (name === "location") {
+      setInfo({ ...info, location: value });
+    }
+    if (name === "feedback") {
+      setInfo({ ...info, feedback: value });
+    }
+    if (name === "openTime") {
+      setInfo({ ...info, openTime: value });
+    }
+    if (name === "closeTime") {
+      setInfo({ ...info, closeTime: value });
     }
   };
-
-  const baseDate = React.useMemo(() => new Date(), []);
-
-  const timesInvalid =
-    !!info.openTime && !!info.closeTime && info.closeTime <= info.openTime;
-
-  const canSubmit =
-    info.name.trim() &&
-    info.typeOfCompany.trim() &&
-    info.location.trim() &&
-    info.openTime &&
-    info.closeTime &&
-    !timesInvalid;
-
+  const createCompany = async () => {
+    const res = await fetch("api/company", {
+      method: "POST",
+      headers: { "Content-type": "application/json" },
+      body: JSON.stringify(info),
+    });
+  };
   return (
     <div className="relative min-h-screen text-white">
       <div
@@ -147,17 +121,23 @@ export default function Page() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <div className="text-sm text-white/80">Location</div>
-                <Input
-                  name="location"
-                  value={info.location}
-                  onChange={handleInputValue}
-                  placeholder="e.g. sukhbaatar district..."
-                  className="border-white/10 bg-white/5 text-white placeholder:text-white/35"
-                />
-              </div>
-            </div>
+        <label className="flex flex-col">
+          close time
+          <Input
+            name="closeTime"
+            onChange={handleInputValue}
+            className="h-[40px] w-[100px]"
+          ></Input>
+        </label>
+        <label className="flex flex-col">
+          feedback
+          <Input
+            name="feedback"
+            onChange={handleInputValue}
+            placeholder="City or address"
+            className="mt-1  text-white"
+          />
+        </label>
 
             <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4">
               <div className="flex items-center justify-between">

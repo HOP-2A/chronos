@@ -1,4 +1,5 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
@@ -9,10 +10,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+type Company = {
+  name: string;
+  typeOfCompany: string;
+  location: string;
+  feedback: string;
+  openTime: string;
+  closeTime: string;
+};
 import { useEffect, useState } from "react";
-import { CompanyType } from "../dashboard/user/[userId]/page";
 const Page = () => {
-  const [company, setCompany] = useState<CompanyType[]>([]);
+  const [company, setCompany] = useState([]);
   const getCompanies = async () => {
     const res = await fetch(`/api/company`, {
       method: "GET",
@@ -22,6 +30,14 @@ const Page = () => {
     }
     const data = await res.json();
     setCompany(data);
+  };
+  console.log(company.id);
+  const deleteCompany = async (id) => {
+    await fetch(`/api/company`, {
+      method: "DELETE",
+      headers: { "Content-type": "application/json" },
+      body: JSON.stringify({ companyId: id }),
+    });
   };
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -84,6 +100,13 @@ const Page = () => {
                     <span className="text-xs font-semibold uppercase text-muted-foreground ">
                       Feedback:
                     </span>
+                    <Button
+                      onClick={() => {
+                        deleteCompany(c.id);
+                      }}
+                    >
+                      DELETE
+                    </Button>
                     <p className="text-sm leading-relaxed text-foreground text-sm text-foreground/80">
                       {c.feedback}
                     </p>

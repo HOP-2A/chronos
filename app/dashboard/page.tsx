@@ -15,7 +15,7 @@ export type UserType = {
 
 const Page = () => {
   const { push } = useRouter();
-  const { user } = useUser();
+  const { user, isLoaded, isSignedIn } = useUser();
 
   const goWorker = () => {
     if (!user?.id) return;
@@ -65,6 +65,7 @@ const Page = () => {
             <div className="grid gap-4 sm:grid-cols-2">
               <button
                 onClick={goWorker}
+                disabled={!isLoaded}
                 className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/10 to-white/[0.02] p-6 text-left transition hover:border-purple-400/40 hover:shadow-[0_0_40px_rgba(168,85,247,0.25)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <div className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100">

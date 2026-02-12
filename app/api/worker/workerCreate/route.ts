@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     const worker = await prisma.worker.create({
       data: {
         email,
-        id: user.clerkId,
+        clerkId: user.clerkId,
         name,
         phoneNumber,
         experience,

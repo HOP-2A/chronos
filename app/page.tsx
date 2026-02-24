@@ -129,7 +129,6 @@ export default function ChronosPrestige() {
   );
 }
 
-// Custom Card for Worker Liquidity
 function WorkerLiquidCard({
   name,
   specialty,

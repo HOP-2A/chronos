@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
-
 export async function POST(req: Request) {
   const {
     name,
@@ -54,4 +53,4 @@ export const DELETE = async (req: NextRequest) => {
     });
     return NextResponse.json(deleteCom);
   }
-};    
+};

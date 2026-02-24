@@ -15,12 +15,7 @@ export type UserType = {
 
 const Page = () => {
   const { push } = useRouter();
-  const { user, isLoaded, isSignedIn } = useUser();
-
-  const goWorker = () => {
-    if (!user?.id) return;
-    push(`/dashboard/worker/workerCompanies/${user?.id}`);
-  };
+  const {isLoaded, isSignedIn } = useUser();
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-black text-white">
@@ -64,7 +59,9 @@ const Page = () => {
           <div className="mx-auto mt-10 max-w-3xl rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.06)] backdrop-blur sm:p-8">
             <div className="grid gap-4 sm:grid-cols-2">
               <button
-                onClick={goWorker}
+                onClick={() => {
+                  push("/dashboard/worker/workerCompanies/");
+                }}
                 disabled={!isLoaded}
                 className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/10 to-white/[0.02] p-6 text-left transition hover:border-purple-400/40 hover:shadow-[0_0_40px_rgba(168,85,247,0.25)] disabled:cursor-not-allowed disabled:opacity-60"
               >

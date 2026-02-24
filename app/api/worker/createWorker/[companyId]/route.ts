@@ -20,14 +20,3 @@ export const POST = async (
   });
   return NextResponse.json(createWorker);
 };
-
-export const GET = async (
-  req: NextRequest,
-  context: { params: Promise<{ companyId: string }> },
-) => {
-  const { companyId } = await context.params;
-  const allWorker = await prisma.worker.findUnique({
-    where: { id: companyId },
-  });
-  return NextResponse.json(allWorker);
-};

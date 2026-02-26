@@ -56,13 +56,14 @@ model Company {
 }
 
 model Worker {
-  id          String   @id @default(nanoid())
-  email       String   @unique
-  clerkId     String?  @unique
-  name        String
-  phoneNumber String?
-  experience  String
-  feedback    String[]
+  id             String   @id @default(nanoid())
+  email          String   @unique
+  clerkId        String?  @unique
+  name           String
+  phoneNumber    String?
+  experience     String
+  feedback       String[]
+  profilePicture String?
 
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])

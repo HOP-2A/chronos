@@ -8,6 +8,7 @@ import {
   Activity,
   Search,
   Bell,
+  CircleUser,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -30,6 +31,7 @@ type WorkerType = {
   companyId: string;
   feedback: string[];
   phoneNumber: number;
+  profilePicture: string;
 };
 
 export default function WorkerPanel() {
@@ -105,7 +107,7 @@ export default function WorkerPanel() {
         </header>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 h-60">
           <StatCard title="Active Workers" value="1,284" change="+12%" />
           <StatCard
             title="System Load"
@@ -113,7 +115,6 @@ export default function WorkerPanel() {
             change="-3%"
             color="text-purple-400"
           />
-          <StatCard title="Task Success" value="99.9%" change="Stable" />
         </div>
 
         {/* Data Table Section */}
@@ -206,7 +207,9 @@ function StatCard({
 }) {
   return (
     <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30">
-      <CardContent className="pt-6">
+      <CardContent className="">
+        <CircleUser color="#FFF" width={45} height={45} />
+        <div></div>
         <p className="text-sm text-slate-500 mb-1">{title}</p>
         <div className="flex items-end justify-between">
           <h2 className={`text-3xl font-bold ${color}`}>{value}</h2>

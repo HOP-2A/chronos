@@ -136,7 +136,7 @@ function WorkerLiquidCard({
         <div className="w-12 h-12 rounded-full border-2 border-white/10 overflow-hidden bg-zinc-800" />
         <div className="text-right">
           <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
-            Rate
+            Үнэ
           </p>
           <p className="text-lg font-black text-white">
             {price}
@@ -156,7 +156,7 @@ function WorkerLiquidCard({
 
       <div className="space-y-2">
         <p className="text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-3">
-          Available Slots
+          Боломжот цагууд
         </p>
         <div className="flex flex-wrap gap-2">
           {slots.map((s: string) => (

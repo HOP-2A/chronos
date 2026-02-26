@@ -108,12 +108,28 @@ export default function WorkerPanel() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 h-60">
-          <StatCard title="Active Workers" value="1,284" change="+12%" />
+          <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30">
+            <CardContent className="">
+              <div className="flex text-white justify-start">
+                <img
+                  className="aspect-square object-cover w-10 h-10 border-2 rounded-full border-border"
+                  src={worker?.profilePicture}
+                />
+                <div className="flex justify-center">{worker?.name}</div>
+              </div>
+              <p className="text-sm text-slate-500 mb-1"></p>
+              <div className="flex items-end justify-between">
+                <h2 className={"text-3xl font-bold "}></h2>
+                <span className="text-xs font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded"></span>
+              </div>
+            </CardContent>
+          </Card>
           <StatCard
             title="System Load"
             value="42.5%"
             change="-3%"
             color="text-purple-400"
+            data={""}
           />
         </div>
 
@@ -195,11 +211,13 @@ function NavItem({
 }
 
 function StatCard({
+  data,
   title,
   value,
   change,
   color = "text-white",
 }: {
+  data: string;
   title: string;
   value: string;
   change: string;
@@ -208,8 +226,12 @@ function StatCard({
   return (
     <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30">
       <CardContent className="">
-        <CircleUser color="#FFF" width={45} height={45} />
-        <div></div>
+        <img
+          className="aspect-square object-cover w-10 h-10 border-2 rounded-full border-border"
+          src={"/"}
+        />
+
+        <div className="text-sm text-slate-500 mb-1">{data}</div>
         <p className="text-sm text-slate-500 mb-1">{title}</p>
         <div className="flex items-end justify-between">
           <h2 className={`text-3xl font-bold ${color}`}>{value}</h2>

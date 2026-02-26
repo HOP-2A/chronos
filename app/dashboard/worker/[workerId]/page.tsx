@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useParams, useRouter } from "next/navigation";
+import { CompanyType } from "../../user/[userId]/page";
 
 type WorkerType = {
   id: string;
@@ -39,16 +40,34 @@ export default function WorkerPanel() {
   const params = useParams();
   const workerId = params.workerId;
   const [worker, setWorker] = useState<WorkerType>();
+  const [company, setCompany] = useState<CompanyType[]>([]);
+  const [timeSchedule, setTimeSchedule] = useState();
 
   const getWorker = async () => {
     const res = await fetch(`/api/worker/${workerId}`);
     const response = await res.json();
     setWorker(response);
   };
-  console.log(worker);
+
+  const getWorkerCompany = async () => {
+    const res = await fetch("/api/company");
+    const response = await res.json();
+    setCompany(response);
+  };
+
+  const getTimeSchedule = async () => {
+    const res = await fetch("/api/worker/getWorkerSchedule", {
+      method: "POST",
+      body: JSON.stringify({ workerId: worker?.id }),
+    });
+    const response = await res.json();
+    setTimeSchedule(response);
+  };
 
   useEffect(() => {
     getWorker();
+    getWorkerCompany();
+    getTimeSchedule();
   }, []);
 
   return (
@@ -109,13 +128,31 @@ export default function WorkerPanel() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 h-60">
           <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30">
-            <CardContent className="">
+            <CardContent className="text-white ">
               <div className="flex text-white justify-start">
                 <img
                   className="aspect-square object-cover w-10 h-10 border-2 rounded-full border-border"
                   src={worker?.profilePicture}
                 />
-                <div className="flex justify-center">{worker?.name}</div>
+                <div className="ml-3 mt-2">{worker?.name}</div>
+              </div>
+              <hr className=" mt-4  " />
+              <p className="text-white mt-4">
+                Утасны дугаар: {worker?.phoneNumber}
+              </p>
+              <div>
+                Ажлын туршлага:
+                <span className="text-xs font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded">
+                  {worker?.experience}
+                </span>
+              </div>
+              <div>Санал хүсэлт: {worker?.feedback[0]}</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30">
+            <CardContent className="">
+              <div className="flex text-white justify-start">
+                <div className="mr-3 mt-1">{worker?.name}</div>
               </div>
               <p className="text-sm text-slate-500 mb-1"></p>
               <div className="flex items-end justify-between">
@@ -124,13 +161,6 @@ export default function WorkerPanel() {
               </div>
             </CardContent>
           </Card>
-          <StatCard
-            title="System Load"
-            value="42.5%"
-            change="-3%"
-            color="text-purple-400"
-            data={""}
-          />
         </div>
 
         {/* Data Table Section */}
@@ -207,40 +237,6 @@ function NavItem({
       {icon}
       <span className="font-medium">{label}</span>
     </div>
-  );
-}
-
-function StatCard({
-  data,
-  title,
-  value,
-  change,
-  color = "text-white",
-}: {
-  data: string;
-  title: string;
-  value: string;
-  change: string;
-  color?: string;
-}) {
-  return (
-    <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30">
-      <CardContent className="">
-        <img
-          className="aspect-square object-cover w-10 h-10 border-2 rounded-full border-border"
-          src={"/"}
-        />
-
-        <div className="text-sm text-slate-500 mb-1">{data}</div>
-        <p className="text-sm text-slate-500 mb-1">{title}</p>
-        <div className="flex items-end justify-between">
-          <h2 className={`text-3xl font-bold ${color}`}>{value}</h2>
-          <span className="text-xs font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded">
-            {change}
-          </span>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
 

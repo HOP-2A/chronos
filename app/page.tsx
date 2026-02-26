@@ -1,9 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, Clock, Globe, Sparkles } from "lucide-react";
+import { ArrowUpRight, Clock, Clock3, Globe, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function ChronosPrestige() {
+  const { push } = useRouter();
   return (
     <div className="min-h-screen bg-[#020203] text-zinc-100 selection:bg-fuchsia-500/30 overflow-x-hidden">
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl z-50 rounded-full border border-white/10 bg-black/40 backdrop-blur-2xl px-6 py-3 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
@@ -18,15 +20,15 @@ export default function ChronosPrestige() {
 
         <div className="hidden md:flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400">
           <a href="#" className="hover:text-fuchsia-400 transition-colors">
-            companies
+            компаниуд
           </a>
           <a href="#" className="hover:text-fuchsia-400 transition-colors">
-            about us
+            бидний тухай
           </a>
         </div>
 
         <Button className="rounded-full bg-fuchsia-500 text-white hover:bg-indigo-400 px-6 h-9 text-xs font-bold transition-all duration-300">
-          CREATE COMPANY
+          КОМПАНИ ҮҮСГЭХ
         </Button>
       </nav>
 
@@ -35,28 +37,29 @@ export default function ChronosPrestige() {
 
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/5 bg-white/5 text-zinc-400 text-[10px] font-bold uppercase tracking-[0.2em]">
-            <Sparkles size={12} className="text-fuchsia-500" /> Appointment
-            Layer 1.0
+            <Sparkles size={12} className="text-fuchsia-500" /> цаг захиалах
+            <Clock3 size={12} className="text-fuchsia-500" />
           </div>
 
           <h1 className="text-6xl md:text-[5.5rem] font-serif italic leading-[1] tracking-tight text-white">
-            Time is your most <br />
+            Цаг бол таны чухал <br />
             <span className="font-sans font-black not-italic text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 via-pink-300 to-indigo-400">
-              liquid asset.
+              хөрөнгө.
             </span>
           </h1>
 
           <p className="text-zinc-500 text-lg max-w-xl mx-auto font-medium leading-relaxed">
-            The infrastructure for modern service agencies. Create a company,
-            deploy your workforce, and sell expertise in real-time.
+            Орчин үеийн үйлчилгээний бизнесийн суурь систем. <br /> Компани
+            байгуул. Ур чадвараа бодит цагт зах зээлд гарга.
           </p>
 
           <div className="flex justify-center gap-4 pt-4">
             <Button
+              onClick={() => push("/dashboard")}
               size="lg"
               className="h-14 px-10 rounded-full bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-bold uppercase text-[11px] tracking-widest shadow-[0_10px_30px_rgba(192,38,211,0.3)]"
             >
-              Get Started
+              Үргэлжлэх
             </Button>
           </div>
         </div>
@@ -67,10 +70,10 @@ export default function ChronosPrestige() {
           <div className="flex justify-between items-end mb-12">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter uppercase italic">
-                Live Network
+                шууд сүлжээ
               </h2>
               <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">
-                Workers currently liquidating service hours
+                одоо үйлчилгээний цагаа борлуулж буй мэргэжилтнүүд
               </p>
             </div>
             <div className="flex gap-2">
@@ -82,21 +85,21 @@ export default function ChronosPrestige() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <WorkerLiquidCard
-              name="Sienna Rivers"
-              specialty="Strategy"
+              name="Төгөлдөр"
+              specialty="стратеги"
               slots={["09:00", "11:00", "14:00"]}
               price="$150"
             />
             <WorkerLiquidCard
-              name="Marcus Thorne"
-              specialty="Engineering"
+              name="Номин"
+              specialty="инженерчлэл"
               slots={["10:00", "13:00", "16:00"]}
               price="$220"
               active
             />
             <WorkerLiquidCard
-              name="Aria Chen"
-              specialty="Design"
+              name="Төрболд"
+              specialty="дизайн"
               slots={["08:00", "12:00", "15:00"]}
               price="$180"
             />
@@ -107,21 +110,10 @@ export default function ChronosPrestige() {
       <footer className="py-12 px-6 border-t border-white/5">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="text-xs font-bold text-zinc-600 uppercase tracking-[0.3em]">
-            ©2026 Chronos Systems Inc.
-          </div>
-          <div className="flex gap-8 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-            <a href="#" className="hover:text-white transition-colors">
-              Privacy
-            </a>
-            <a href="#" className="hover:text-white transition-colors">
-              Terms
-            </a>
-            <a href="#" className="hover:text-white transition-colors">
-              Security
-            </a>
+            ©2026 Chronos XXK
           </div>
           <div className="flex items-center gap-2 text-zinc-400 text-[10px] font-bold uppercase tracking-widest">
-            <Globe size={12} className="text-fuchsia-500" /> Global Node Active
+            <Globe size={12} className="text-fuchsia-500" /> pinecone academy
           </div>
         </div>
       </footer>
@@ -144,7 +136,7 @@ function WorkerLiquidCard({
         <div className="w-12 h-12 rounded-full border-2 border-white/10 overflow-hidden bg-zinc-800" />
         <div className="text-right">
           <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
-            Rate
+            Үнэ
           </p>
           <p className="text-lg font-black text-white">
             {price}
@@ -164,7 +156,7 @@ function WorkerLiquidCard({
 
       <div className="space-y-2">
         <p className="text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-3">
-          Available Slots
+          Боломжот цагууд
         </p>
         <div className="flex flex-wrap gap-2">
           {slots.map((s: string) => (

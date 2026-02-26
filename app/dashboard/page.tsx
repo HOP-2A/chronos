@@ -15,7 +15,7 @@ export type UserType = {
 
 const Page = () => {
   const { push } = useRouter();
-  const {isLoaded, isSignedIn } = useUser();
+  const { isLoaded } = useUser();
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-black text-white">
@@ -41,18 +41,18 @@ const Page = () => {
           <div className="mx-auto max-w-2xl text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/80 backdrop-blur">
               <span className="h-2 w-2 rounded-full bg-purple-400 shadow-[0_0_18px_rgba(168,85,247,0.9)]" />
-              chronos • role selection
+              chronos • дүр сонголт
             </div>
 
             <h1 className="mt-6 text-balance text-5xl font-black tracking-tight sm:text-6xl">
-              welcome to{" "}
               <span className="bg-gradient-to-r from-purple-300 via-purple-400 to-sky-300 bg-clip-text text-transparent">
-                chronos
+                CHRONOS - д <br />
               </span>
+              тавтай морил
             </h1>
 
             <p className="mt-4 text-pretty text-base text-white/70 sm:text-lg">
-              choose your role to continue. you can always switch later.
+              Дүрээ сонгож үргэлжлэнэ үү, та дараа үүнийг солих боломжтой.
             </p>
           </div>
 
@@ -73,30 +73,25 @@ const Page = () => {
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-500/15 ring-1 ring-purple-400/20">
                     <span className="text-xl">🛠️</span>
                   </div>
-                  <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
-                    dashboard
-                  </div>
                 </div>
 
                 <div className="mt-5">
                   <div className="text-xl font-semibold tracking-tight">
-                    worker
+                    АЖИЛТАН
                   </div>
                   <p className="mt-1 text-sm text-white/70">
-                    view schedules, clock in/out, and manage your assigned
-                    tasks.
+                    хуваарь харах • ажлаа удирдах
                   </p>
                 </div>
 
                 <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-white/90">
-                  continue
+                  үргэлжлэх
                   <span className="transition group-hover:translate-x-0.5">
                     →
                   </span>
                 </div>
               </button>
 
-              {/* user */}
               <SignUpButton
                 mode="modal"
                 forceRedirectUrl="/after-auth"
@@ -114,22 +109,19 @@ const Page = () => {
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500/15 ring-1 ring-sky-400/20">
                       <span className="text-xl">👤</span>
                     </div>
-                    <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
-                      sign up
-                    </div>
                   </div>
 
                   <div className="mt-5">
                     <div className="text-xl font-semibold tracking-tight">
-                      user
+                      ХЭРЭГЛЭГЧ
                     </div>
                     <p className="mt-1 text-sm text-white/70">
-                      create an account to start managing teams and companies.
+                      хаяг үүсгэж компаниудын үйлчилгээг хэрэглэх
                     </p>
                   </div>
 
                   <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-white/90">
-                    create account
+                    хаяг бүртгүүлэх
                     <span className="transition group-hover:translate-x-0.5">
                       →
                     </span>
@@ -140,12 +132,12 @@ const Page = () => {
 
             <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-5 sm:flex-row">
               <p className="text-xs text-white/55">
-                by continuing, you agree to chronos terms and privacy policy.
+                үргэлжлүүлснээр та chronos-ийн нөхцөл зөвшөөрч байна.
               </p>
 
               <div className="flex items-center gap-2 text-xs text-white/55">
                 <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
-                secure auth powered by clerk
+                clerk-ээр хамгаалагдсан нэвтрэлт систэм
               </div>
             </div>
           </div>

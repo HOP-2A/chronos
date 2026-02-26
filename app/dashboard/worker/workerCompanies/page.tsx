@@ -16,15 +16,15 @@ type companyType = {
 
 const Page = () => {
   const [company, setCompany] = useState<companyType[]>([]);
-  const [loading, setLoading] = useState(true);
   const { push } = useRouter();
   const allCompanyGet = async () => {
-    const response = await fetch("/api/company");
-    const res = await response.json();
-    setCompany(res);
+    const res = await fetch("/api/company");
+    const data = await res.json();
+    setCompany(data);
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     allCompanyGet();
   }, []);
 

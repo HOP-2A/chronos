@@ -6,7 +6,6 @@ export const POST = async (
   { params }: { params: Promise<{ companyId: string }> },
 ) => {
   try {
-    // ✅ Await params because it is a Promise
     const { companyId } = await params;
 
     if (!companyId) {
@@ -18,7 +17,6 @@ export const POST = async (
 
     const { email, name, phoneNumber, experience } = await req.json();
 
-    // 1️⃣ Check company
     const company = await prisma.company.findUnique({
       where: { id: companyId },
     });
@@ -27,23 +25,23 @@ export const POST = async (
       return NextResponse.json({ error: "Company not found" }, { status: 404 });
     }
 
-    // 2️⃣ Create worker
-    const worker = await prisma.worker.create({
-      data: {
-        email,
-        name,
-        phoneNumber,
-        experience,
-      },
+    const worker = await prisma.worker.upsert({
+      where: { email },
+      update: { name, phoneNumber, experience },
+      create: { email, name, phoneNumber, experience },
     });
 
-    // 3️⃣ Create application
-    const application = await prisma.workerApplication.create({
-      data: {
-        workerId: worker.id,
-        companyId: companyId,
-      },
-    });
+    let application;
+    try {
+      application = await prisma.workerApplication.create({
+        data: { workerId: worker.id, companyId },
+      });
+    } catch (e: any) {
+      return NextResponse.json(
+        { error: "application already exists for this company" },
+        { status: 409 },
+      );
+    }
 
     return NextResponse.json({ worker, application });
   } catch (error) {

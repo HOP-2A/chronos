@@ -1,10 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
-
+import { ChangeEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Building2, MapPin, Briefcase, Clock, PlusCircle } from "lucide-react";
+
+import { upload } from "@vercel/blob/client";
+
 import {
   Card,
   CardContent,
@@ -14,15 +17,15 @@ import {
 } from "@/components/ui/card";
 
 import { TimePicker } from "../_component/TimePicker";
+import { toast } from "sonner";
 
 type CompanyInfo = {
   name: string;
   typeOfCompany: string;
   location: string;
-
   openTime: Date | null;
   closeTime: Date | null;
-
+  image: string;
   workers: Array<{
     email: string;
     name: string;
@@ -41,10 +44,13 @@ export default function Page() {
     location: "",
     openTime: null,
     closeTime: null,
+    image: "",
     workers: [
       { email: "", name: "", phoneNumber: "", experience: [], feedback: [] },
     ],
   });
+  const [uploading, setUploading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -57,6 +63,7 @@ export default function Page() {
       return prev;
     });
   };
+  console.log(file);
 
   const createCompany = async () => {
     try {
@@ -89,7 +96,42 @@ export default function Page() {
       setIsSubmitting(false);
     }
   };
+  const fetchFile = (e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
+    setFile(selectedFile);
 
+    const previewUrl = URL.createObjectURL(selectedFile);
+    setInfo((prev) => ({
+      ...prev,
+      image: previewUrl,
+    }));
+  };
+
+  const uploadPhoto = async () => {
+    if (!file) return;
+
+    try {
+      setUploading(true);
+
+      const uploaded = await upload(file.name, file, {
+        access: "public",
+        handleUploadUrl: "/api/image",
+      });
+
+      setInfo((prev) => ({
+        ...prev,
+        image: uploaded.url,
+      }));
+      setFile(null);
+      toast.success("Photo uploaded successfully");
+    } catch (err) {
+      console.error("Upload failed:", err);
+      toast.error("Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
   const baseDate = React.useMemo(() => new Date(), []);
 
   const timesInvalid =
@@ -104,108 +146,156 @@ export default function Page() {
     !timesInvalid;
 
   return (
-      <div className="relative min-h-screen text-white">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('${BG_URL}')` }}
-        />
+    <div className="relative min-h-screen overflow-hidden text-white bg-[#0f1014]">
+      <div
+        className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
+        style={{ backgroundImage: `url('${BG_URL}')` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/60 to-blue-900/20" />
 
-        <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-600/20 blur-[120px] rounded-full" />
+      <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-purple-600/20 blur-[120px] rounded-full" />
 
-        <div className="relative mx-auto flex min-h-screen max-w-4xl items-center justify-center p-6">
-          <Card className="w-full max-w-xl border-white/10 bg-black/50 backdrop-blur-xl">
-            <CardHeader className="space-y-2">
-              <CardTitle className="text-3xl text-white">
-                Create a company
+      <div className="relative mx-auto flex min-h-screen max-w-4xl items-center justify-center p-6">
+        <Card className="w-full max-w-xl border-white/10 bg-black/40 backdrop-blur-2xl shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] ring-1 ring-white/10">
+          <CardHeader className="space-y-3 pb-8 text-center sm:text-left">
+            <div className="mx-auto sm:mx-0 w-12 h-12 bg-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20 mb-2">
+              <PlusCircle className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-3xl font-black tracking-tight text-white uppercase italic">
+                Create{" "}
+                <span className="text-purple-500 font-black">Company</span>
               </CardTitle>
-              <CardDescription className="text-white/70">
-                Basic company details + business hours.
+              <CardDescription className="text-gray-400 font-medium">
+                Start your journey by setting up your business profile
               </CardDescription>
-            </CardHeader>
+            </div>
+          </CardHeader>
 
-            <CardContent className="space-y-6">
-              <div className="grid gap-4">
-                <div className="space-y-2">
-                  <div className="text-sm text-white/80">Company name</div>
-                  <Input
-                    name="companyName"
-                    value={info.name}
-                    onChange={handleInputValue}
-                    placeholder="e.g. paradox barbers"
-                    className="border-white/10 bg-white/5 text-white placeholder:text-white/35"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-sm text-white/80">Type of company</div>
-                  <Input
-                    name="companyType"
-                    value={info.typeOfCompany}
-                    onChange={handleInputValue}
-                    placeholder="e.g. barbershop, repair shop"
-                    className="border-white/10 bg-white/5 text-white placeholder:text-white/35"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-sm text-white/80">Location</div>
-                  <Input
-                    name="location"
-                    value={info.location}
-                    onChange={handleInputValue}
-                    placeholder="e.g. sukhbaatar district..."
-                    className="border-white/10 bg-white/5 text-white placeholder:text-white/35"
-                  />
-                </div>
+          <CardContent className="space-y-6">
+            <div className="grid gap-5">
+              <div className="space-y-2 group">
+                <label className="text-[11px] font-black uppercase tracking-widest text-gray-500 group-focus-within:text-blue-400 transition-colors flex items-center gap-2">
+                  <Building2 className="w-3 h-3" /> Company name
+                </label>
+                <Input
+                  name="companyName"
+                  value={info.name}
+                  onChange={handleInputValue}
+                  placeholder="e.g. Paradox Barbers"
+                  className="h-12 border-white/5 bg-white/5 text-white placeholder:text-gray-600 focus:bg-white/10 focus:ring-1 focus:ring-blue-500/50 transition-all rounded-xl"
+                />
               </div>
 
-              <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-white/90">
-                    Business hours
-                  </p>
-                  <span className="text-xs text-white/50">Mon–Fri</span>
-                </div>
+              <div className="space-y-2 group">
+                <label className="text-[11px] font-black uppercase tracking-widest text-gray-500 group-focus-within:text-blue-400 transition-colors flex items-center gap-2">
+                  <Briefcase className="w-3 h-3" /> Business Type
+                </label>
+                <Input
+                  name="companyType"
+                  value={info.typeOfCompany}
+                  onChange={handleInputValue}
+                  placeholder="e.g. Barbershop, Repair Shop"
+                  className="h-12 border-white/5 bg-white/5 text-white placeholder:text-gray-600 focus:bg-white/10 focus:ring-1 focus:ring-blue-500/50 transition-all rounded-xl"
+                />
+              </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-2 group">
+                <label className="text-[11px] font-black uppercase tracking-widest text-gray-500 group-focus-within:text-blue-400 transition-colors flex items-center gap-2">
+                  <MapPin className="w-3 h-3" /> Location
+                </label>
+                <Input
+                  name="location"
+                  value={info.location}
+                  onChange={handleInputValue}
+                  placeholder="e.g. Sukhbaatar District, UB"
+                  className="h-12 border-white/5 bg-white/5 text-white placeholder:text-gray-600 focus:bg-white/10 focus:ring-1 focus:ring-blue-500/50 transition-all rounded-xl"
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <div>
+                  <Input
+                    type="file"
+                    id="file-upload"
+                    accept="image/*"
+                    onChange={fetchFile}
+                    placeholder="image"
+                    className="h-12 border-white/5 bg-white/5 text-white placeholder:text-gray-600 focus:bg-white/10 focus:ring-1 focus:ring-blue-500/50 transition-all rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Button
+                    type="button"
+                    onClick={uploadPhoto}
+                    className="h-12.5 rounded-xl  border-white/5 "
+                  >
+                    save
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-5">
+              <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                <p className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-2">
+                  <Clock className="w-3 h-3" /> Business hours
+                </p>
+                <span className="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full font-bold border border-blue-500/20">
+                  MON – FRI
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="space-y-1">
                   <TimePicker
-                    label="Open time"
+                    label="Opening At"
                     value={info.openTime}
                     onChange={(d) => setInfo((p) => ({ ...p, openTime: d }))}
                     stepMinutes={15}
                     baseDate={baseDate}
                     use12h={false}
+                    className="bg-transparent"
                   />
-
+                </div>
+                <div className="space-y-1">
                   <TimePicker
-                    label="Close time"
+                    label="Closing At"
                     value={info.closeTime}
                     onChange={(d) => setInfo((p) => ({ ...p, closeTime: d }))}
                     stepMinutes={15}
                     baseDate={baseDate}
                     use12h={false}
+                    className="bg-transparent"
                   />
                 </div>
+              </div>
 
-                {timesInvalid && (
-                  <p className="text-xs text-red-400">
-                    close time must be after open time
-                  </p>
+              {timesInvalid && (
+                <p className="text-[11px] text-red-400 font-medium flex items-center gap-1">
+                  ⚠ Close time must be after open time
+                </p>
+              )}
+            </div>
+            <div className="pt-2">
+              <Button
+                className="w-full h-12 bg-blue-600 text-white hover:bg-blue-500 active:scale-[0.98] transition-all rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-blue-600/30 disabled:opacity-30"
+                onClick={createCompany}
+                disabled={!canSubmit || isSubmitting}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Processing...
+                  </span>
+                ) : (
+                  "Launch Company"
                 )}
-              </div>
-
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <Button
-                  className="bg-white text-black hover:bg-white/90 disabled:opacity-50"
-                  onClick={createCompany}
-                  disabled={!canSubmit || isSubmitting}
-                >
-                  {isSubmitting ? "Creating..." : "Create company"}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+    </div>
   );
 }

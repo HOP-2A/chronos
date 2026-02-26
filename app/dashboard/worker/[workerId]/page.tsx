@@ -21,17 +21,29 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useParams, useRouter } from "next/navigation";
 
+type WorkerType = {
+  id: string;
+  name: string;
+  email: string;
+  experience: string;
+  clerkId: string;
+  companyId: string;
+  feedback: string[];
+  phoneNumber: number;
+};
+
 export default function WorkerPanel() {
   const { push } = useRouter();
   const params = useParams();
   const workerId = params.workerId;
-  const [worker, setWorker] = useState([]);
+  const [worker, setWorker] = useState<WorkerType>();
 
   const getWorker = async () => {
     const res = await fetch(`/api/worker/${workerId}`);
     const response = await res.json();
     setWorker(response);
   };
+  console.log(worker);
 
   useEffect(() => {
     getWorker();
@@ -69,10 +81,11 @@ export default function WorkerPanel() {
         {/* Header */}
         <header className="flex justify-between items-center mb-10">
           <div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">
-              Worker Overview
-            </h1>
-            <p className="text-slate-500">Welcome back, Administrator.</p>
+            <div>
+              <h1 className="text-3xl font-bold text-white tracking-tight">
+                {worker?.name}
+              </h1>
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="relative">

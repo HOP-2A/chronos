@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast, Toaster } from "sonner";
 
 export default function CreateWorkerPage() {
@@ -13,8 +13,6 @@ export default function CreateWorkerPage() {
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [experience, setExperience] = useState("");
-  const [workerId, setWorkerId] = useState("");
-  const [loading, setLoading] = useState();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +25,6 @@ export default function CreateWorkerPage() {
         name,
         phoneNumber,
         experience,
-        status: "PENDING",
       }),
     });
 
@@ -38,24 +35,13 @@ export default function CreateWorkerPage() {
       setPhoneNumber("");
       setExperience("");
       const worker = await res.json();
-      const workerId = await worker.id;
-      setWorkerId(workerId);
+      push(`/dashboard/worker/${worker.worker.id}`);
     } else {
       toast.error("Failed to create worker");
       return;
     }
   };
 
-  const workerIdIfCheck = () => {
-    if (workerId.length > 0) {
-      push(`/dashboard/worker/${workerId}`);
-    } else {
-      console.log("worker Id algoo :((( D: gunig sad sad sad");
-    }
-  };
-  useEffect(() => {
-    workerIdIfCheck();
-  }, [workerId]);
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0A0A0A] p-4 sm:p-6 text-gray-100">
       <Toaster />
@@ -125,7 +111,7 @@ export default function CreateWorkerPage() {
             />
           </div>
 
-          <div onClick={() => {}}>
+          <div>
             <button
               onClick={handleSubmit}
               className="w-full mt-4 py-3 px-4 bg-white text-black text-sm font-bold rounded-lg hover:bg-gray-200 transition-all active:scale-[0.98] shadow-lg shadow-white/5"

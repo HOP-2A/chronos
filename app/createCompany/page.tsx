@@ -18,6 +18,7 @@ import {
 
 import { TimePicker } from "../_component/TimePicker";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type CompanyInfo = {
   name: string;
@@ -38,6 +39,7 @@ type CompanyInfo = {
 const BG_URL = "";
 
 export default function Page() {
+  const { push } = useRouter();
   const [info, setInfo] = useState<CompanyInfo>({
     name: "",
     typeOfCompany: "",
@@ -147,6 +149,33 @@ export default function Page() {
 
   return (
     <div className="relative min-h-screen overflow-hidden text-white bg-[#0f1014]">
+      <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl z-50 rounded-full border border-white/10 bg-black/40 backdrop-blur-2xl px-6 py-3 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <div className="flex items-center gap-2 group cursor-pointer">
+          <div className="w-7 h-7 bg-fuchsia-600 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(192,38,211,0.5)] group-hover:rotate-90 transition-transform duration-500">
+            <Clock size={14} className="text-white" />
+          </div>
+          <span className="font-bold tracking-tighter text-lg uppercase italic">
+            Chronos
+          </span>
+        </div>
+        <div className="hidden md:flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400">
+          <div
+            onClick={() => push("/dashboard/worker/workerCompanies")}
+            className="hover:text-fuchsia-400 transition-colors cursor-pointer"
+          >
+            компаниуд
+          </div>
+          <a href="#" className="hover:text-fuchsia-400 transition-colors">
+            бидний тухай
+          </a>
+        </div>
+        <Button
+          onClick={() => push("/createCompany")}
+          className="rounded-full bg-fuchsia-500 text-white hover:bg-indigo-400 px-6 h-9 text-xs font-bold transition-all duration-300"
+        >
+          КОМПАНИ ҮҮСГЭХ
+        </Button>
+      </nav>
       <div
         className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
         style={{ backgroundImage: `url('${BG_URL}')` }}

@@ -32,19 +32,21 @@ export default function WorkerPanel() {
   const params = useParams();
   const workerId = params.workerId;
   const [worker, setWorker] = useState<WorkerType>();
-  const [company, setCompany] = useState<CompanyType[]>([]);
   const [timeSchedule, setTimeSchedule] = useState();
+  const [company, setCompany] = useState<CompanyType[]>([]);
 
   const getWorker = async () => {
     const res = await fetch(`/api/worker/${workerId}`);
     const response = await res.json();
     setWorker(response);
+    getCompany();
   };
+  console.log(worker?.companyId);
 
-  const getWorkerCompany = async () => {
-    const res = await fetch("/api/worker/getWorkersByCompanyId/${companyId}");
-    const response = await res.json();
-    setCompany(response);
+  const getCompany = async () => {
+    const response = await fetch("/api/company/${companyId}");
+    const res = await response.json();
+    setCompany(res);
   };
 
   const getTimeSchedule = async () => {
@@ -58,11 +60,9 @@ export default function WorkerPanel() {
 
   useEffect(() => {
     getWorker();
-    getWorkerCompany();
     getTimeSchedule();
   }, []);
   console.log(worker, "worker");
-  console.log(company, "company");
   console.log(timeSchedule, "time");
 
   return (

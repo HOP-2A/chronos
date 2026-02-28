@@ -24,10 +24,11 @@ export async function POST(req: Request) {
     },
     include: { owner: true },
   });
-
-  return NextResponse.json(company);
 }
-
+export const GET = async () => {
+  const getCompany = await prisma.company.findMany();
+  return NextResponse.json(getCompany);
+};
 export const DELETE = async (req: NextRequest) => {
   const { companyId } = await req.json();
   const findCompanyId = await prisma.company.findUnique({

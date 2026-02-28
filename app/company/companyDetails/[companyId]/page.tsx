@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 
 type CompanyDetails = {
@@ -17,15 +17,19 @@ type CompanyDetails = {
 };
 
 export default function Page() {
+  const { push } = useRouter();
   const params = useParams();
   const companyId = String(params.companyId);
   const [companyInfo, setCompanyInfo] = useState<CompanyDetails | null>(null);
   const [companyWorkers, setCompanyWorkers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchCompanyInfo = async () => {
+    setIsLoading(true);
     const response = await fetch(`/api/company/getCompanyInfo/${companyId}`);
     const res = await response.json();
     setCompanyInfo(res);
+    setIsLoading(false);
   };
 
   const fetchCompanyWorkers = async () => {
@@ -37,12 +41,25 @@ export default function Page() {
   };
 
   useEffect(() => {
-    fetchCompanyInfo();
-    fetchCompanyWorkers();
+    const loadData = async () => {
+      setIsLoading(true);
+      await fetchCompanyInfo();
+      await fetchCompanyWorkers();
+      setIsLoading(false);
+    };
+
+    loadData();
   }, []);
 
   return (
     <div className="min-h-screen w-full bg-[#0A0A0A] text-gray-100 font-sans flex flex-col">
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xl z-50 flex items-center justify-center">
+          <div className="text-white text-sm tracking-widest animate-pulse">
+            LOADING
+          </div>
+        </div>
+      )}
       {companyInfo?.image && (
         <div className="h-[40vh] sm:h-[50vh] w-full relative">
           <img
@@ -131,6 +148,9 @@ export default function Page() {
               <div
                 key={worker.id}
                 className="bg-[#0A0A0A] p-6 hover:bg-white/[0.02] transition-colors group"
+                onClick={() =>
+                  push(`/dashboard/worker/workerOrder/${worker.id}`)
+                }
               >
                 <p className="text-sm font-medium text-white mb-1 group-hover:text-emerald-400 transition-colors">
                   {worker.name}

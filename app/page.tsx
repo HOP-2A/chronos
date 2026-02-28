@@ -17,17 +17,21 @@ export default function ChronosPrestige() {
             Chronos
           </span>
         </div>
-
         <div className="hidden md:flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-          <a href="#" className="hover:text-fuchsia-400 transition-colors">
+          <div
+            onClick={() => push("/dashboard/worker/workerCompanies")}
+            className="hover:text-fuchsia-400 transition-colors cursor-pointer"
+          >
             компаниуд
-          </a>
+          </div>
           <a href="#" className="hover:text-fuchsia-400 transition-colors">
             бидний тухай
           </a>
         </div>
-
-        <Button className="rounded-full bg-fuchsia-500 text-white hover:bg-indigo-400 px-6 h-9 text-xs font-bold transition-all duration-300">
+        <Button
+          onClick={() => push("/createCompany")}
+          className="rounded-full bg-fuchsia-500 text-white hover:bg-indigo-400 px-6 h-9 text-xs font-bold transition-all duration-300"
+        >
           КОМПАНИ ҮҮСГЭХ
         </Button>
       </nav>

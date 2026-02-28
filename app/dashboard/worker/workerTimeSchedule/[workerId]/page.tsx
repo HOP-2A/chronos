@@ -144,12 +144,7 @@ export default function Page() {
             </div>
           </div>
 
-          <div
-            className="pt-4 border-t border-white/10"
-            onClick={() => {
-              push(`/dashboard/worker/profile/${workerId}`);
-            }}
-          >
+          <div className="pt-4 border-t border-white/10">
             <button
               onClick={createSchedule}
               className="w-full rounded-xl py-3 text-sm font-semibold text-white bg-indigo-500/30 border border-indigo-400/30 hover:bg-indigo-500/50 transition shadow-[0_0_25px_rgba(99,102,241,0.4)]"

@@ -14,6 +14,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useParams, useRouter } from "next/navigation";
 import { CompanyType } from "../../user/[userId]/page";
+import { Day } from "@prisma/client";
+import { DayOption, Schedule } from "../workerTimeSchedule/[workerId]/page";
 
 type WorkerType = {
   id: string;
@@ -25,6 +27,27 @@ type WorkerType = {
   feedback: string[];
   phoneNumber: number;
   profilePicture: string;
+  applications: [
+    {
+      companyId: string;
+      createdAt: Day;
+      decidedAt: string;
+      decidedById: string;
+      id: string;
+      reason: string;
+      workerId: string;
+    },
+  ];
+  timeSchedule: [
+    {
+      id: string;
+      companyId: string;
+      workerId: string;
+      day: DayOption;
+      startTime: string;
+      endTime: string;
+    },
+  ];
 };
 
 export default function WorkerPanel() {
@@ -32,38 +55,62 @@ export default function WorkerPanel() {
   const params = useParams();
   const workerId = params.workerId;
   const [worker, setWorker] = useState<WorkerType>();
-  const [timeSchedule, setTimeSchedule] = useState();
-  const [company, setCompany] = useState<CompanyType[]>([]);
+  const [wApplications, setWApplications] = useState([]);
+  const [timeSchedule, setTimeSchedule] = useState<Schedule>();
+  const [company, setCompany] = useState<CompanyType>();
 
   const getWorker = async () => {
     const res = await fetch(`/api/worker/${workerId}`);
-    const response = await res.json();
-    setWorker(response);
-    getCompany();
-  };
-  console.log(worker?.companyId);
+    const wData: WorkerType = await res.json();
+    setWorker(wData);
 
-  const getCompany = async () => {
-    const response = await fetch("/api/company/${companyId}");
-    const res = await response.json();
-    setCompany(res);
+    if (wData.companyId) {
+      const res = await fetch(`/api/company/${wData?.companyId}`);
+      const workCompany = await res.json();
+      if (res.ok || workCompany.length > 0) {
+        setCompany(workCompany);
+      } else {
+        console.log(
+          "ajilgu worker bnoo :( ajilguidel ch ih hetsuu shuuuu, ajild avchaachee",
+        );
+      }
+    }
+  };
+
+  const getWorkerApplications = async () => {
+    const res = await fetch(`/api/worker/${workerId}`);
+    const wApplicationData = await res.json();
+    setWApplications(wApplicationData);
   };
 
   const getTimeSchedule = async () => {
     const res = await fetch("/api/worker/getWorkerSchedule", {
       method: "POST",
-      body: JSON.stringify({ workerId: worker?.id }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ workerId }),
     });
     const response = await res.json();
     setTimeSchedule(response);
   };
 
+  // const startHour = timeSchedule?.startTime;
+  // const endHour = timeSchedule?.endTime;
+
+  // const timeSlots: string[] = [];
+
+  // for (let hour = startHour!; hour < endHour!; hour++) {
+  //   const from = String(hour).padStart(2, "0") + ":00";
+  //   const to = String(hour + 1).padStart(2, "0") + ":00";
+  //   timeSlots.push(`${from}-${to}`);
+  // }
+
+  // console.log(timeSlots);
+
   useEffect(() => {
     getWorker();
     getTimeSchedule();
+    getWorkerApplications();
   }, []);
-  console.log(worker, "worker");
-  console.log(timeSchedule, "time");
 
   return (
     <div className="flex min-h-screen bg-black text-slate-200 font-sans">
@@ -125,10 +172,9 @@ export default function WorkerPanel() {
             </button>
           </div>
         </header>
-
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 h-60">
-          <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 ">
+          <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30 h-60">
             <CardContent className="text-white ">
               <div className="flex text-white justify-start">
                 <img
@@ -150,64 +196,86 @@ export default function WorkerPanel() {
               <div>Санал хүсэлт: {worker?.feedback[0]}</div>
             </CardContent>
           </Card>
-          <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30">
-            <CardContent className="">
-              <div className="flex text-white justify-start">
-                <div className="mr-3 mt-1">{worker?.name}</div>
-              </div>
-              <p className="text-sm text-slate-500 mb-1"></p>
-              <div className="flex items-end justify-between">
-                <h2 className={"text-3xl font-bold "}></h2>
-                <span className="text-xs font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded"></span>
-              </div>
+          {company ? (
+            <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30 h-70">
+              <CardContent className="text-white ">
+                <img
+                  className="h-[50px] w-[100px] object-contain flex justify-center"
+                  src={company.image}
+                />
+                <div className="flex text-white justify-start">
+                  <div className="ml-3 mt-2">{company?.name}</div>
+                </div>
+                <p className="text-white mt-4">Хаяг: {company?.location}</p>
+                <div>
+                  Цагийн хуваарь:
+                  <span className="text-xs font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded">
+                    WORKING HOURS GO HERE
+                  </span>
+                </div>
+                <div>Санал хүсэлт: {worker?.feedback[0]}</div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30">
+              <CardContent className="text-white ">
+                <div className="flex text-white justify-start">
+                  Таны явуулсан хүсэлтийг компани тань арай хүлээн зөвшөөрөөгүй
+                  байна.
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        <div>
+          {" "}
+          <Card className="bg-black/40 border-purple-900/30 backdrop-blur-sm">
+            <CardContent>
+              <Table>
+                <TableHeader className="border-purple-900/50 text-white">
+                  <TableRow>
+                    <TableHead
+                      key={timeSchedule?.id}
+                      className="text-center py-4"
+                    >
+                      <div
+                        className={`flex flex-col items-center ${timeSchedule?.day}`}
+                      >
+                        <span className="text-[11px] font-bold leading-none">
+                          {timeSchedule?.startTime}
+                        </span>
+                        <span className="text-[10px] uppercase mt-1 opacity-80">
+                          {timeSchedule?.endTime}
+                        </span>
+                      </div>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <WorkerRow
+                    id="#WRK-001"
+                    name="Alpha-Node"
+                    status="Active"
+                    uptime="14d 2h"
+                  />
+                  <WorkerRow
+                    id="#WRK-042"
+                    name="Omega-Stream"
+                    status="Standby"
+                    uptime="02d 5h"
+                  />
+                  <WorkerRow
+                    id="#WRK-099"
+                    name="Zeta-Core"
+                    status="Error"
+                    uptime="-- --"
+                  />
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         </div>
-
-        {/* Data Table Section */}
-        <Card className="bg-black/40 border-purple-900/30 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-purple-100 text-lg">
-              Recent Worker Logs
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader className="border-purple-900/50">
-                <TableRow>
-                  <TableHead className="text-purple-400/70">ID</TableHead>
-                  <TableHead className="text-purple-400/70">
-                    Worker Name
-                  </TableHead>
-                  <TableHead className="text-purple-400/70">Status</TableHead>
-                  <TableHead className="text-purple-400/70 text-right">
-                    Uptime
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <WorkerRow
-                  id="#WRK-001"
-                  name="Alpha-Node"
-                  status="Active"
-                  uptime="14d 2h"
-                />
-                <WorkerRow
-                  id="#WRK-042"
-                  name="Omega-Stream"
-                  status="Standby"
-                  uptime="02d 5h"
-                />
-                <WorkerRow
-                  id="#WRK-099"
-                  name="Zeta-Core"
-                  status="Error"
-                  uptime="-- --"
-                />
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
       </main>
     </div>
   );

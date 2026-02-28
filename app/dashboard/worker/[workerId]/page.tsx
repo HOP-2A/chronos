@@ -1,15 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  LayoutDashboard,
-  Users,
-  Settings,
-  Activity,
-  Search,
-  Bell,
-  CircleUser,
-} from "lucide-react";
+import { LayoutDashboard, Users, Settings, Search, Bell } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -50,7 +42,7 @@ export default function WorkerPanel() {
   };
 
   const getWorkerCompany = async () => {
-    const res = await fetch("/api/company");
+    const res = await fetch("/api/worker/getWorkersByCompanyId/${companyId}");
     const response = await res.json();
     setCompany(response);
   };
@@ -69,6 +61,9 @@ export default function WorkerPanel() {
     getWorkerCompany();
     getTimeSchedule();
   }, []);
+  console.log(worker, "worker");
+  console.log(company, "company");
+  console.log(timeSchedule, "time");
 
   return (
     <div className="flex min-h-screen bg-black text-slate-200 font-sans">
@@ -81,16 +76,22 @@ export default function WorkerPanel() {
         </div>
 
         <nav className="flex flex-col gap-2">
-          <NavItem
-            icon={<LayoutDashboard size={20} />}
-            label="Dashboard"
-            active
-          />
-          <div onClick={() => push(`/dashboard/worker/${workerId}/profile`)}>
-            <NavItem icon={<Users size={20} />} label="Workers" />
-          </div>
           <div onClick={() => push(`/dashboard/worker/${workerId}`)}>
-            <NavItem icon={<Activity size={20} />} label="Analytics" />
+            <NavItem
+              icon={<LayoutDashboard size={20} />}
+              label="Dashboard"
+              active
+            />
+          </div>
+          <div onClick={() => push(`/dashboard/worker/${workerId}/profile`)}>
+            <NavItem icon={<Users size={20} />} label="Profile" />
+          </div>
+          <div
+            onClick={() =>
+              push("/dashboard/worker/${workerId}/workers/${companyId}")
+            }
+          >
+            <NavItem icon={<Users size={20} />} label="Workers" />
           </div>
           <div onClick={() => push(`/dashboard/worker/${workerId}/settings`)}>
             <NavItem icon={<Settings size={20} />} label="Settings" />

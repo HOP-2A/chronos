@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { UserType } from "../../../user/[userId]/page";
 import { useRouter } from "next/navigation";
 
-type DayOption =
+export type DayOption =
   | "MONDAY"
   | "TUESDAY"
   | "WEDNESDAY"
@@ -14,7 +14,7 @@ type DayOption =
   | "SATURDAY"
   | "SUNDAY";
 
-type Schedule = {
+export type Schedule = {
   id: string;
   companyId: string;
   workerId: string;

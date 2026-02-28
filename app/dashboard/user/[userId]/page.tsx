@@ -11,14 +11,15 @@ export type UserType = {
   companyId: string;
 };
 export type CompanyType = {
-  closeTime: string;
+  closeTime: Date;
   createdAt: Date;
   feedback: string;
   id: string;
   location: string;
   name: string;
-  openTime: string;
+  openTime: Date;
   typeOfCompany: string;
+  image: string;
 };
 
 const UserPanel = () => {

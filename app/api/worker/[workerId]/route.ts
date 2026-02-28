@@ -9,6 +9,10 @@ export const GET = async (
   try {
     const user = await prisma.worker.findUnique({
       where: { id: workerId },
+      include: {
+        applications: true,
+        timeSchedules: true,
+      },
     });
 
     if (!user) {

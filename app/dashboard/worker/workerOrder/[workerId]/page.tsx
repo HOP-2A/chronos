@@ -1,5 +1,6 @@
 "use client";
 
+import { interval } from "date-fns";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -80,6 +81,30 @@ export default function Page() {
   const handleOpenDialog = (schedule: Schedule) => {
     setSelectedSchedule(schedule);
     setOpenDialog(true);
+  };
+
+  const generateSlots = (
+    startTime: string,
+    endTime: string,
+    intervalMinutes: number,
+  ) => {
+    const slots: string[] = [];
+
+    const [startHour, startMinute] = startTime.split(":").map(Number);
+    const [endHour, endMinute] = endTime.split(":").map(Number);
+
+    let current = new Date();
+    current.setHours(startHour, startMinute, 0, 0);
+
+    const end = new Date();
+    end.setHours(endHour, endMinute, 0, 0);
+
+    while (current < end) {
+      slots.push(current.toTimeString().slice(0, 5));
+      current.setMinutes(current.getMinutes() + intervalMinutes);
+    }
+
+    return slots;
   };
 
   return (
@@ -185,17 +210,18 @@ export default function Page() {
             </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.05]">
-              {filteredSchedule.map((info) => (
-                <div
-                  key={info.id}
-                  className="bg-[#0A0A0A] p-6 hover:bg-white/[0.02] transition group"
-                  onClick={() => handleOpenDialog(info)}
-                >
-                  <p className="text-lg text-gray-300 font-mono tracking-tight group-hover:text-white transition">
-                    {info.startTime} — {info.endTime}
-                  </p>
-                </div>
-              ))}
+              {filteredSchedule.flatMap((info) =>
+                generateSlots(info.startTime, info.endTime, interval).map(
+                  (slot) => (
+                    <div
+                      key={info.id + slot}
+                      className="p-5 bg-white/10 border border-white/10 rounded-2xl hover:bg-white/15 transition"
+                    >
+                      <div className="text-lg text-white font-mono">{slot}</div>
+                    </div>
+                  ),
+                ),
+              )}
             </div>
           )}
         </section>

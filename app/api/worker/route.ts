@@ -2,7 +2,11 @@ import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { endTime, startTime, day, workerId } = await req.json();
+  const { endTime, startTime, day, workerId, slotInterval } = await req.json();
+
+  if (!workerId) {
+    return NextResponse.json({ error: "WorkerId needed" }, { status: 400 });
+  }
 
   const worker = await prisma.worker.findUnique({
     where: { id: workerId },
@@ -14,31 +18,35 @@ export async function POST(req: NextRequest) {
 
   const existed = await prisma.timeSchedule.findFirst({
     where: {
-      endTime,
-      startTime,
-      day,
       workerId,
+      day,
+      startTime,
+      endTime,
     },
   });
 
-  if (!existed) {
-    const createNewSchedule = await prisma.timeSchedule.create({
-      data: {
-        endTime,
-        startTime,
-        workerId,
-        day,
-        companyId: worker.companyId,
-      },
-    });
-
-    return NextResponse.json(createNewSchedule, { status: 201 });
-  } else {
-    return NextResponse.json("failed", { status: 404 });
+  if (existed) {
+    return NextResponse.json(
+      { error: "Schedule already exists" },
+      { status: 409 },
+    );
   }
+
+  const schedule = await prisma.timeSchedule.create({
+    data: {
+      day,
+      startTime,
+      endTime,
+      slotInterval: slotInterval || 60,
+      workerId,
+      companyId: worker.companyId,
+    },
+  });
+
+  return NextResponse.json(schedule, { status: 201 });
 }
 
-export const GET = async () => {
-  const allworkers = await prisma.worker.findMany();
-  return NextResponse.json(allworkers);
-};
+export async function GET() {
+  const schedules = await prisma.timeSchedule.findMany();
+  return NextResponse.json(schedules);
+}

@@ -45,7 +45,6 @@ type CompanyInfo = {
   }>;
 };
 
-
 const days = [
   { full: "Monday", short: "MON", emoji: "🌅" },
   { full: "Tuesday", short: "TUE", emoji: "✦" },
@@ -73,7 +72,7 @@ export default function Page() {
   });
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
- const [date, setDate] = React.useState<Date>();
+  const [date, setDate] = React.useState<Date>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState("x ");
 
@@ -86,9 +85,6 @@ export default function Page() {
       return prev;
     });
   };
-
-
-  // Inside your Page component...
 
   const createCompany = async () => {
     try {
@@ -332,19 +328,8 @@ export default function Page() {
                     className="h-12 border-white/5 bg-white/5 text-white focus:bg-white/10 focus:ring-1 focus:ring-blue-500/50 transition-all rounded-xl [color-scheme:dark] appearance-none"
                   />
                 </div>
-                              <div className="space-y-2 group">
-                <label className="text-[11px] font-black uppercase tracking-widest text-gray-500 group-focus-within:text-blue-400 transition-colors flex items-center gap-2">
-                  <MapPin className="w-3 h-3" /> Location
-                </label>
-                <Input
-                  name="location"
-                  value={info.location}
-                  onChange={handleInputValue}
-                  placeholder="e.g. Sukhbaatar District, UB"
-                  className="h-12 border-white/5 bg-white/5 text-white placeholder:text-gray-600 focus:bg-white/10 focus:ring-1 focus:ring-blue-500/50 transition-all rounded-xl"
-                />
               </div>
-              </div>
+            </div>
 
             <div className="pt-2">
               <Button

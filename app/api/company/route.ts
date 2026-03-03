@@ -24,6 +24,7 @@ export async function POST(req: Request) {
     },
     include: { owner: true },
   });
+  return NextResponse.json(createdCompany);
 }
 export const GET = async () => {
   const getCompany = await prisma.company.findMany();

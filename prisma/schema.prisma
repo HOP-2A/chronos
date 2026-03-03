@@ -34,15 +34,22 @@ enum WorkerRequestStatus {
   ACCEPTED
 }
 
+enum AppointmentStatus {
+  BOOKED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
 model Company {
-  id            String    @id @default(nanoid())
+  id            String   @id @default(nanoid())
   name          String
   typeOfCompany String
   location      String?
   feedback      String?
-  createdAt     DateTime  @default(now())
-  openTime      DateTime?
-  closeTime     DateTime?
+  createdAt     DateTime @default(now())
+  openTime      String
+  closeTime     String
   image         String?
 
   workers      Worker[]
@@ -51,8 +58,9 @@ model Company {
   timeSchedules TimeSchedule[]
   users         User[]
 
-  admin   Admin?  @relation(fields: [adminId], references: [id])
-  adminId String?
+  admin        Admin?        @relation(fields: [adminId], references: [id])
+  adminId      String?
+  appointments Appointment[]
 }
 
 model Worker {
@@ -70,16 +78,18 @@ model Worker {
 
   applications  WorkerApplication[]
   timeSchedules TimeSchedule[]
+  appointments  Appointment[]
 }
 
 model User {
-  id        String   @id @default(nanoid())
-  name      String
-  email     String   @unique
-  role      Role     @default(USER)
-  clerkId   String   @unique
-  company   Company? @relation(fields: [companyId], references: [id])
-  companyId String?
+  id           String        @id @default(nanoid())
+  name         String
+  email        String        @unique
+  role         Role          @default(USER)
+  clerkId      String        @unique
+  company      Company?      @relation(fields: [companyId], references: [id])
+  companyId    String?
+  appointments Appointment[]
 }
 
 model Admin {
@@ -119,4 +129,27 @@ model WorkerApplication {
   @@unique([workerId, companyId])
   @@index([companyId, status])
   @@index([workerId, status])
+}
+
+model Appointment {
+  id        String @id @default(nanoid())
+  userId    String
+  workerId  String
+  companyId String
+
+  startAt DateTime
+  endAt   DateTime
+  status  AppointmentStatus @default(BOOKED)
+
+  createdAt    DateTime  @default(now())
+  cancelledAt  DateTime?
+  cancelReason String?
+
+  user    User    @relation(fields: [userId], references: [id])
+  worker  Worker  @relation(fields: [workerId], references: [id])
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@index([workerId, startAt])
+  @@index([userId, startAt])
+  @@index([companyId, startAt])
 }

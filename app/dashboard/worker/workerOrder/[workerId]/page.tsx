@@ -1,6 +1,5 @@
 "use client";
 
-import { interval } from "date-fns";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -20,6 +19,7 @@ type Schedule = {
   day: DayOption;
   startTime: string;
   endTime: string;
+  slotInterval: number;
 };
 
 export default function Page() {
@@ -86,14 +86,14 @@ export default function Page() {
   const generateSlots = (
     startTime: string,
     endTime: string,
-    intervalMinutes: number,
+    interval: number,
   ) => {
-    const slots: string[] = [];
+    const slots = [];
 
     const [startHour, startMinute] = startTime.split(":").map(Number);
     const [endHour, endMinute] = endTime.split(":").map(Number);
 
-    let current = new Date();
+    const current = new Date();
     current.setHours(startHour, startMinute, 0, 0);
 
     const end = new Date();
@@ -101,7 +101,7 @@ export default function Page() {
 
     while (current < end) {
       slots.push(current.toTimeString().slice(0, 5));
-      current.setMinutes(current.getMinutes() + intervalMinutes);
+      current.setMinutes(current.getMinutes() + interval);
     }
 
     return slots;
@@ -198,30 +198,33 @@ export default function Page() {
             <h2 className="text-xs uppercase tracking-[0.4em]">
               {day} Schedule
             </h2>
-
-            <span className="text-[10px] font-mono text-gray-600">
-              {filteredSchedule.length} entries
-            </span>
           </div>
-
           {filteredSchedule.length === 0 ? (
             <p className="text-gray-600 text-lg">
               No schedule found for {day}.
             </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.05]">
-              {filteredSchedule.flatMap((info) =>
-                generateSlots(info.startTime, info.endTime, interval).map(
-                  (slot) => (
-                    <div
-                      key={info.id + slot}
-                      className="p-5 bg-white/10 border border-white/10 rounded-2xl hover:bg-white/15 transition"
-                    >
-                      <div className="text-lg text-white font-mono">{slot}</div>
-                    </div>
-                  ),
-                ),
-              )}
+              {filteredSchedule.map((info) => {
+                const slots = generateSlots(
+                  info.startTime,
+                  info.endTime,
+                  info.slotInterval ?? 60,
+                );
+                return slots.map((slot, index) => (
+                  <div
+                    key={index}
+                    className="bg-[#0A0A0A] p-8 flex flex-col items-center justify-center group hover:bg-white/[0.02] transition-colors"
+                  >
+                    <span className="text-[10px] font-bold text-gray-700 uppercase tracking-[0.2em] mb-3 group-hover:text-emerald-500 transition-colors">
+                      Time Slot
+                    </span>
+                    <span className="text-3xl font-light text-white font-mono tracking-tighter">
+                      {slot}
+                    </span>
+                  </div>
+                ));
+              })}
             </div>
           )}
         </section>

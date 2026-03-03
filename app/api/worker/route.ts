@@ -37,16 +37,11 @@ export async function POST(req: NextRequest) {
       day,
       startTime,
       endTime,
-      slotInterval: slotInterval || 60,
+      slotInterval: slotInterval,
       workerId,
       companyId: worker.companyId,
     },
   });
 
   return NextResponse.json(schedule, { status: 201 });
-}
-
-export async function GET() {
-  const schedules = await prisma.timeSchedule.findMany();
-  return NextResponse.json(schedules);
 }

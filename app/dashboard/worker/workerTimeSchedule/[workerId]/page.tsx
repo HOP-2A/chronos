@@ -19,6 +19,7 @@ type Schedule = {
   day: DayOption;
   startTime: string;
   endTime: string;
+  slotInterval: number;
 };
 
 type UserType = any;
@@ -33,6 +34,7 @@ export default function Page() {
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("17:00");
   const [workerSchedule, setWorkerSchedule] = useState<Schedule[]>([]);
+  const [slotInterval, setSlotInterval] = useState(60);
 
   const userGet = async () => {
     const response = await fetch(`/api/worker/${workerId}`);
@@ -51,6 +53,7 @@ export default function Page() {
         startTime,
         endTime,
         workerId,
+        slotInterval,
       }),
     });
 
@@ -75,117 +78,174 @@ export default function Page() {
   };
 
   useEffect(() => {
+    if (!workerId) return;
     userGet();
-    if (workerId) getWorkerSchedule(workerId);
+    getWorkerSchedule(workerId);
   }, [workerId]);
 
   const filteredSchedule = workerSchedule.filter((info) => info.day === day);
 
+  const generateSlots = (
+    startTime: string,
+    endTime: string,
+    interval: number,
+  ) => {
+    const slots = [];
+
+    const [startHour, startMinute] = startTime.split(":").map(Number);
+    const [endHour, endMinute] = endTime.split(":").map(Number);
+
+    const current = new Date();
+    current.setHours(startHour, startMinute, 0, 0);
+
+    const end = new Date();
+    end.setHours(endHour, endMinute, 0, 0);
+
+    while (current < end) {
+      slots.push(current.toTimeString().slice(0, 5));
+      current.setMinutes(current.getMinutes() + interval);
+    }
+
+    return slots;
+  };
+
   return (
-    <div className="min-h-screen w-full bg-[#0A0A0A] text-gray-100 flex items-center justify-center p-8">
-      <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8">
-        <div className="flex-1 rounded-2xl p-8 space-y-8 bg-white/5 backdrop-blur-xl border border-white/10">
-          <div className="flex justify-between items-start gap-4">
+    <div className="min-h-screen w-full bg-[#0A0A0A] text-gray-100 font-sans flex flex-col">
+      <nav className="w-full p-6 border-b border-white/[0.05] flex justify-between items-center bg-[#0A0A0A]">
+        <div className="flex items-center gap-4">
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500">
+            Scheduling System
+          </span>
+        </div>
+        <button
+          onClick={() => push("/")}
+          className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-white transition"
+        >
+          Close
+        </button>
+      </nav>
+
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        <div className="w-full lg:w-[450px] p-8 sm:p-12 border-b lg:border-b-0 lg:border-r border-white/[0.05] space-y-12 overflow-y-auto">
+          <header>
+            <h1 className="text-4xl font-semibold tracking-tighter text-white mb-2">
+              Configure
+            </h1>
+            <p className="text-sm text-gray-500">
+              Define operational time slots and intervals.
+            </p>
+          </header>
+          <div className="space-y-8">
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600">
+                Weekday
+              </label>
+              <select
+                value={day}
+                onChange={(e) => setDay(e.target.value as DayOption)}
+                className="w-full bg-white/[0.02] border border-white/[0.05] rounded-lg px-4 py-4 text-sm text-gray-200 focus:ring-1 focus:ring-white/20 outline-none transition appearance-none"
+              >
+                {[
+                  "MONDAY",
+                  "TUESDAY",
+                  "WEDNESDAY",
+                  "THURSDAY",
+                  "FRIDAY",
+                  "SATURDAY",
+                  "SUNDAY",
+                ].map((d) => (
+                  <option key={d} value={d} className="bg-[#111111]">
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600">
+                  Start
+                </label>
+                <input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className="w-full bg-white/[0.02] border border-white/[0.05] rounded-lg px-4 py-4 text-sm text-gray-200 focus:ring-1 focus:ring-white/20 outline-none"
+                />
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600">
+                  End
+                </label>
+                <input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="w-full bg-white/[0.02] border border-white/[0.05] rounded-lg px-4 py-4 text-sm text-gray-200 focus:ring-1 focus:ring-white/20 outline-none"
+                />
+              </div>
+            </div>
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600">
+                Interval (Minutes)
+              </label>
+              <input
+                type="number"
+                value={slotInterval}
+                onChange={(e) => setSlotInterval(Number(e.target.value))}
+                placeholder="60"
+                className="w-full bg-white/[0.02] border border-white/[0.05] rounded-lg px-4 py-4 text-sm text-gray-200 focus:ring-1 focus:ring-white/20 outline-none"
+              />
+            </div>
+          </div>
+          <button
+            onClick={createSchedule}
+            className="w-full py-5 bg-white text-black text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-gray-200 transition-all active:scale-[0.98] shadow-lg shadow-white/5"
+          >
+            Save Schedule
+          </button>
+        </div>
+        <div className="flex-1 bg-[#0A0A0A] p-8 sm:p-12 overflow-y-auto">
+          <header className="flex justify-between items-end mb-12 border-b border-white/[0.05] pb-6">
             <div>
-              <h2 className="text-3xl font-semibold tracking-tight">
-                Add Worker Schedule
+              <h2 className="text-xs font-bold uppercase tracking-[0.4em] text-white">
+                Timeline View
               </h2>
-              <p className="text-sm text-gray-500 mt-2">
-                Add time slot for worker
+              <p className="text-sm text-gray-600 mt-2">
+                {day} generated slots
               </p>
             </div>
-
-            <button
-              onClick={() => push("/")}
-              className="px-4 py-2 text-xs uppercase tracking-widest border border-white/20 rounded-lg hover:bg-white/10 transition"
-            >
-              Back
-            </button>
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs uppercase tracking-[0.3em] text-gray-600">
-              Weekday
-            </label>
-
-            <select
-              value={day}
-              onChange={(e) => setDay(e.target.value as DayOption)}
-              className="w-full rounded-xl px-4 py-3 bg-white/10 border border-white/20 text-gray-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
-            >
-              {[
-                "MONDAY",
-                "TUESDAY",
-                "WEDNESDAY",
-                "THURSDAY",
-                "FRIDAY",
-                "SATURDAY",
-                "SUNDAY",
-              ].map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-xs uppercase tracking-[0.3em] text-gray-600">
-                Start Time
-              </label>
-
-              <input
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="w-full rounded-xl px-4 py-3 bg-white/10 border border-white/20 text-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
-              />
+            <div className="text-[10px] font-mono text-gray-700 uppercase tracking-widest">
+              {filteredSchedule.length > 0 ? "Status: Active" : "Status: Empty"}
             </div>
-
-            <div className="space-y-2">
-              <label className="text-xs uppercase tracking-[0.3em] text-gray-600">
-                End Time
-              </label>
-
-              <input
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className="w-full rounded-xl px-4 py-3 bg-white/10 border border-white/20 text-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
-              />
-            </div>
-          </div>
-          <div className="pt-4 border-t border-white/10">
-            <button
-              onClick={createSchedule}
-              className="w-full py-3 rounded-xl bg-indigo-500/30 border border-indigo-400/30 hover:bg-indigo-500/50 transition shadow-lg text-sm uppercase tracking-widest"
-            >
-              Save Schedule
-            </button>
-          </div>
-        </div>
-        <div className="flex-1 rounded-2xl p-8 bg-white/5 border border-white/10 backdrop-blur-xl">
-          <h3 className="text-2xl font-semibold mb-6 tracking-tight">
-            Worker Schedule
-          </h3>
-
+          </header>
           {filteredSchedule.length === 0 ? (
-            <p className="text-gray-600">No schedule found for {day}.</p>
+            <div className="h-64 flex flex-col items-center justify-center border border-dashed border-white/[0.05] rounded-2xl opacity-50">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-gray-500">
+                No active slots found
+              </p>
+            </div>
           ) : (
-            <div className="space-y-4">
-              {filteredSchedule.map((info) => (
-                <div
-                  key={info.id}
-                  className="p-5 bg-white/10 border border-white/10 rounded-2xl hover:bg-white/15 transition"
-                >
-                  <div className="text-lg font-medium text-white">
-                    {info.day}
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-px bg-white/[0.05] border border-white/[0.05]">
+              {filteredSchedule.map((info) => {
+                const slots = generateSlots(
+                  info.startTime,
+                  info.endTime,
+                  info.slotInterval ?? 60,
+                );
+                return slots.map((slot, index) => (
+                  <div
+                    key={index}
+                    className="bg-[#0A0A0A] p-8 flex flex-col items-center justify-center group hover:bg-white/[0.02] transition-colors"
+                  >
+                    <span className="text-[10px] font-bold text-gray-700 uppercase tracking-[0.2em] mb-3 group-hover:text-emerald-500 transition-colors">
+                      Time Slot
+                    </span>
+                    <span className="text-3xl font-light text-white font-mono tracking-tighter">
+                      {slot}
+                    </span>
                   </div>
-
-                  <div className="text-lg text-gray-300 font-mono tracking-tight mt-1">
-                    {info.startTime} — {info.endTime}
-                  </div>
-                </div>
-              ))}
+                ));
+              })}
             </div>
           )}
         </div>

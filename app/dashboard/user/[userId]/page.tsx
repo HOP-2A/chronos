@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { LayoutDashboard, User, Settings, LogOut, Menu, X } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
 export type UserType = {
   id: string;
   name: string;
@@ -11,13 +14,13 @@ export type UserType = {
   companyId: string;
 };
 export type CompanyType = {
-  closeTime: Date;
+  closeTime: string;
   createdAt: Date;
   feedback: string;
   id: string;
   location: string;
   name: string;
-  openTime: Date;
+  openTime: string;
   typeOfCompany: string;
   image: string;
 };
@@ -44,14 +47,9 @@ const UserPanel = () => {
     userGet();
     companyGet();
   }, []);
+  console.log(company.map((a) => a.id));
 
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-
-  const menuItems = [
-    { name: "Dashboard", icon: <LayoutDashboard size={20} /> },
-    { name: "Profile", icon: <User size={20} /> },
-    { name: "Settings", icon: <Settings size={20} /> },
-  ];
 
   return (
     <div className="flex h-screen bg-zinc-950 text-zinc-100 font-sans">
@@ -64,62 +62,66 @@ const UserPanel = () => {
         <div className="p-6 flex items-center justify-between">
           {isSidebarOpen && (
             <h1 className="text-xl font-bold text-purple-500 tracking-tight">
-              CORE
+              CHRONOS
             </h1>
           )}
-          <button
-            onClick={() => setSidebarOpen(!isSidebarOpen)}
-            className="p-1 hover:bg-zinc-800 rounded-lg text-purple-400"
-          >
-            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
         </div>
 
-        <nav className="flex-1 px-4 space-y-2">
-          {menuItems.map((item) => (
-            <div
-              key={item.name}
-              className="flex items-center p-3 rounded-xl cursor-pointer transition-colors hover:bg-purple-600/10 hover:text-purple-400 group"
-            >
-              <span className="group-hover:scale-110 transition-transform">
-                {item.icon}
-              </span>
-              {isSidebarOpen && (
-                <span className="ml-4 font-medium">{item.name}</span>
-              )}
-            </div>
-          ))}
+        <nav className="flex flex-col gap-2">
+          <div onClick={() => push(`/dashboard/user/${userId}`)}>
+            <NavItem
+              icon={<LayoutDashboard size={20} />}
+              label="Dashboard"
+              active
+            />
+          </div>
+          <div onClick={() => push(`/dashboard/user/${userId}/profile`)}>
+            <NavItem icon={<User size={20} />} label="Profile" />
+          </div>
+
+          <div onClick={() => push(`/dashboard/user/${userId}/settings`)}>
+            <NavItem icon={<Settings size={20} />} label="Settings" />
+          </div>
         </nav>
-
-        <div className="p-4 border-t border-zinc-800">
-          <button className="flex items-center w-full p-3 text-zinc-400 hover:text-red-400 transition-colors">
-            <LogOut size={20} />
-            {isSidebarOpen && <span className="ml-4 font-medium">Logout</span>}
-          </button>
-        </div>
       </aside>
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 border-b border-zinc-800 flex items-center justify-between px-8 bg-zinc-950/50 backdrop-blur-md">
-          <h2 className="text-lg font-semibold">User Overview</h2>
-          <div className="flex items-center gap-4">
-            <div className="h-8 w-8 rounded-full bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.4)]" />
-          </div>
-        </header>
-
         <section className="p-8 overflow-y-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Example Card */}
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="p-6 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-purple-500/50 transition-colors group"
-              >
-                <p className="text-zinc-400 text-sm mb-1">Active Projects</p>
-                <h3 className="text-2xl font-bold group-hover:text-purple-400 transition-colors">
-                  12
-                </h3>
+            {company.map((a, index) => (
+              <div key={index}>
+                <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30 h-70">
+                  <CardContent className="text-white ">
+                    {a.image ? (
+                      <img
+                        className="w-40 h-40 sm:h-48 object-cover object-center"
+                        src={a.image}
+                      />
+                    ) : (
+                      "no image"
+                    )}
+                    <div className="flex text-white justify-start">
+                      <div className="ml-3 mt-2">{a?.name}</div>
+                    </div>
+                    <p className="text-white mt-4">Хаяг: {a?.location}</p>
+                    <div>
+                      Цагийн хуваарь:
+                      <span className="text-xs font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded">
+                        WORKING HOURS GO HERE
+                      </span>
+                    </div>
+                    <Button
+                      className="w-full mt-2"
+                      onClick={() => {
+                        push(`/company/companyDetails/${a.id}`);
+                      }}
+                    >
+                      Компани руу очих
+                    </Button>
+                  </CardContent>
+                </Card>
               </div>
             ))}
           </div>
@@ -136,3 +138,28 @@ const UserPanel = () => {
 };
 
 export default UserPanel;
+function NavItem({
+  icon,
+  label,
+  active = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  active?: boolean;
+}) {
+  return (
+    <div
+      className={`
+      flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200
+      ${
+        active
+          ? "bg-purple-600/20 text-purple-400 border border-purple-500/30 shadow-[inset_0_0_10px_rgba(168,85,247,0.1)]"
+          : "text-slate-500 hover:text-purple-300 hover:bg-purple-900/10"
+      }
+    `}
+    >
+      {icon}
+      <span className="font-medium">{label}</span>
+    </div>
+  );
+}

@@ -163,14 +163,6 @@ export default function Page() {
           </div>
         </section>
       </div>
-
-      <div className="sticky bottom-0 w-full p-6 bg-[#0A0A0A]/90 backdrop-blur-xl border-t border-white/[0.05]">
-        <div className="max-w-7xl mx-auto flex justify-end">
-          <button className="w-full sm:w-auto px-12 py-4 bg-white text-black text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-gray-200 transition-all active:scale-[0.98]">
-            Байгууллагыг удирдах
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

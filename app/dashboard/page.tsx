@@ -3,6 +3,7 @@
 import { SignUpButton, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { chronosClerkAppearance } from "../_component/ChronosClerk";
+import { useEffect, useState } from "react";
 
 export type UserType = {
   id: string;
@@ -15,7 +16,26 @@ export type UserType = {
 
 const Page = () => {
   const { push } = useRouter();
-  const { isLoaded } = useUser();
+  const { user, isLoaded, isSignedIn } = useUser();
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+
+    const checkUserRole = async () => {
+      const res = await fetch("/api/userCheck");
+      const data = await res.json();
+
+      if (data.role === "WORKER") {
+        push(`/dashboard/worker/${data.id}/`);
+      }
+
+      if (data.role === "USER") {
+        push(`/dashboard/user/${user.id}/`);
+      }
+    };
+
+    checkUserRole();
+  }, [isLoaded, isSignedIn, push]);
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-black text-white">

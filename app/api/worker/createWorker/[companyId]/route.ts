@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/db";
+import { clerkClient } from "@clerk/nextjs/server";
+import { Role } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (
@@ -15,8 +17,28 @@ export const POST = async (
       );
     }
 
-    const { email, name, phoneNumber, experience } = await req.json();
+    const { email, name, phoneNumber, experience, password } = await req.json();
+    const existingWorker = prisma.worker.findFirst({
+      where: {
+        email,
+      },
+    });
 
+    if (!existingWorker) {
+      return NextResponse.json(
+        { error: "Worker already exist" },
+        { status: 400 },
+      );
+    }
+
+    const client = await clerkClient();
+    const clerkUser = await client.users.createUser({
+      emailAddress: [email],
+      password: password,
+      skipPasswordChecks: false,
+      skipPasswordRequirement: false,
+      publicMetadata: { role: Role.WORKER },
+    });
     const company = await prisma.company.findUnique({
       where: { id: companyId },
     });
@@ -28,7 +50,15 @@ export const POST = async (
     const worker = await prisma.worker.upsert({
       where: { email },
       update: { name, phoneNumber, experience },
-      create: { email, name, phoneNumber, experience },
+      create: {
+        email,
+        name,
+        phoneNumber,
+        experience,
+        password,
+        clerkId,
+        role: Role.WORKER,
+      },
     });
 
     let application;

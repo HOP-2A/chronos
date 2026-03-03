@@ -103,14 +103,15 @@ model Admin {
 }
 
 model TimeSchedule {
-  id        String   @id @default(nanoid())
-  day       Day
-  startTime String
-  endTime   String
-  company   Company? @relation(fields: [companyId], references: [id])
-  companyId String?
-  worker    Worker?  @relation(fields: [workerId], references: [id])
-  workerId  String?
+  id           String   @id @default(nanoid())
+  day          Day
+  startTime    String
+  endTime      String
+  slotInterval Int      @default(60)
+  company      Company? @relation(fields: [companyId], references: [id])
+  companyId    String?
+  worker       Worker?  @relation(fields: [workerId], references: [id])
+  workerId     String?
 }
 
 model WorkerApplication {

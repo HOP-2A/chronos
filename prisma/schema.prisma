@@ -94,6 +94,7 @@ model User {
 
 model Admin {
   id          String  @id @default(nanoid())
+  clerkId     String? @unique
   name        String
   email       String  @unique
   phoneNumber String?

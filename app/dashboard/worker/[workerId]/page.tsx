@@ -38,16 +38,14 @@ type WorkerType = {
       workerId: string;
     },
   ];
-  timeSchedule: [
-    {
-      id: string;
-      companyId: string;
-      workerId: string;
-      day: DayOption;
-      startTime: string;
-      endTime: string;
-    },
-  ];
+  timeSchedule: {
+    id: string;
+    companyId: string;
+    workerId: string;
+    day: DayOption;
+    startTime: string;
+    endTime: string;
+  };
 };
 
 export default function WorkerPanel() {
@@ -93,19 +91,22 @@ export default function WorkerPanel() {
     setTimeSchedule(response);
   };
 
-  // const startHour = timeSchedule?.startTime;
-  // const endHour = timeSchedule?.endTime;
+  const timeSlots: string[] = [];
 
-  // const timeSlots: string[] = [];
+  if (timeSchedule?.startTime && timeSchedule?.endTime) {
+    const startHour = Number(timeSchedule.startTime.split(":")[0]);
+    const endHour = Number(timeSchedule.endTime.split(":")[0]);
 
-  // for (let hour = startHour!; hour < endHour!; hour++) {
-  //   const from = String(hour).padStart(2, "0") + ":00";
-  //   const to = String(hour + 1).padStart(2, "0") + ":00";
-  //   timeSlots.push(`${from}-${to}`);
-  // }
-
-  // console.log(timeSlots);
-
+    for (let hour = startHour; hour < endHour; hour++) {
+      const from = String(hour).padStart(2, "0") + ":00";
+      const to = String(hour + 1).padStart(2, "0") + ":00";
+      timeSlots.push(`${from}-${to}`);
+    }
+    console.log(startHour, endHour);
+  }
+  console.log(timeSchedule);
+  console.log(timeSlots);
+  
   useEffect(() => {
     getWorker();
     getTimeSchedule();
@@ -229,50 +230,45 @@ export default function WorkerPanel() {
         </div>
 
         <div>
-          {" "}
-          <Card className="bg-black/40 border-purple-900/30 backdrop-blur-sm">
-            <CardContent>
-              <Table>
-                <TableHeader className="border-purple-900/50 text-white">
-                  <TableRow>
-                    <TableHead
-                      key={timeSchedule?.id}
-                      className="text-center py-4"
+          <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30 backdrop-blur-xl">
+            <CardContent className="p-6">
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-white">
+                  Working Schedule
+                </h2>
+                <p className="text-sm text-slate-400 mt-1">
+                  {timeSchedule?.day}
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                {timeSlots.length > 0 ? (
+                  timeSlots.map((slot, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center px-4 py-3 rounded-lg 
+                       bg-black/40 border border-purple-900/20
+                       hover:bg-purple-900/10 transition-all"
                     >
-                      <div
-                        className={`flex flex-col items-center ${timeSchedule?.day}`}
+                      <span className="font-mono text-sm text-slate-300">
+                        {slot}
+                      </span>
+
+                      <span
+                        className="text-xs px-3 py-1 rounded-full 
+                             bg-purple-500/20 text-purple-400 
+                             border border-purple-500/30"
                       >
-                        <span className="text-[11px] font-bold leading-none">
-                          {timeSchedule?.startTime}
-                        </span>
-                        <span className="text-[10px] uppercase mt-1 opacity-80">
-                          {timeSchedule?.endTime}
-                        </span>
-                      </div>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <WorkerRow
-                    id="#WRK-001"
-                    name="Alpha-Node"
-                    status="Active"
-                    uptime="14d 2h"
-                  />
-                  <WorkerRow
-                    id="#WRK-042"
-                    name="Omega-Stream"
-                    status="Standby"
-                    uptime="02d 5h"
-                  />
-                  <WorkerRow
-                    id="#WRK-099"
-                    name="Zeta-Core"
-                    status="Error"
-                    uptime="-- --"
-                  />
-                </TableBody>
-              </Table>
+                        Available
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-slate-500 text-sm">
+                    No schedule assigned yet.
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>

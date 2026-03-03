@@ -55,7 +55,6 @@ export const POST = async (
         name,
         phoneNumber,
         experience,
-        password,
         clerkId,
         role: Role.WORKER,
       },

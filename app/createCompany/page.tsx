@@ -47,6 +47,7 @@ export default function Page() {
     openTime: null,
     closeTime: null,
     image: "",
+    adminID: "",
     workers: [
       { email: "", name: "", phoneNumber: "", experience: [], feedback: [] },
     ],
@@ -67,11 +68,16 @@ export default function Page() {
   };
   console.log(file);
 
+  // Inside your Page component...
+
   const createCompany = async () => {
     try {
       setIsSubmitting(true);
       const payload = {
-        ...info,
+        name: info.name,
+        typeOfCompany: info.typeOfCompany,
+        location: info.location,
+        image: info.image,
         openTime: info.openTime ? info.openTime.toISOString() : null,
         closeTime: info.closeTime ? info.closeTime.toISOString() : null,
       };
@@ -82,18 +88,18 @@ export default function Page() {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to create company");
+      }
 
       const data = await res.json();
 
-      setInfo((prev) => ({
-        ...prev,
-        ...data,
-        openTime: data.openTime ? new Date(data.openTime) : null,
-        closeTime: data.closeTime ? new Date(data.closeTime) : null,
-      }));
-    } catch (err) {
+      toast.success("Байгууллага амжилттай үүслээ!");
+      push(`/company/admin/${data.id}`);
+    } catch (err: any) {
       console.error(err);
+      toast.error(err.message);
     } finally {
       setIsSubmitting(false);
     }

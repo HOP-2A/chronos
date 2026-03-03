@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type DayOption =
+export type DayOption =
   | "MONDAY"
   | "TUESDAY"
   | "WEDNESDAY"
@@ -12,7 +12,7 @@ type DayOption =
   | "SATURDAY"
   | "SUNDAY";
 
-type Schedule = {
+export type Schedule = {
   id: string;
   companyId: string;
   workerId: string;

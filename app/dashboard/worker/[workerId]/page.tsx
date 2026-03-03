@@ -1,26 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  LayoutDashboard,
-  Users,
-  Settings,
-  Activity,
-  Search,
-  Bell,
-  CircleUser,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { LayoutDashboard, Users, Settings, Search, Bell } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useParams, useRouter } from "next/navigation";
+import { CompanyType } from "../../user/[userId]/page";
+import { Day } from "@prisma/client";
+import { DayOption, Schedule } from "../workerTimeSchedule/[workerId]/page";
 
 type WorkerType = {
   id: string;
@@ -32,6 +20,25 @@ type WorkerType = {
   feedback: string[];
   phoneNumber: number;
   profilePicture: string;
+  applications: [
+    {
+      companyId: string;
+      createdAt: Day;
+      decidedAt: string;
+      decidedById: string;
+      id: string;
+      reason: string;
+      workerId: string;
+    },
+  ];
+  timeSchedule: {
+    id: string;
+    companyId: string;
+    workerId: string;
+    day: DayOption;
+    startTime: string;
+    endTime: string;
+  };
 };
 
 export default function WorkerPanel() {
@@ -39,16 +46,64 @@ export default function WorkerPanel() {
   const params = useParams();
   const workerId = params.workerId;
   const [worker, setWorker] = useState<WorkerType>();
+  const [wApplications, setWApplications] = useState([]);
+  const [timeSchedule, setTimeSchedule] = useState<Schedule>();
+  const [company, setCompany] = useState<CompanyType>();
 
   const getWorker = async () => {
     const res = await fetch(`/api/worker/${workerId}`);
-    const response = await res.json();
-    setWorker(response);
+    const wData: WorkerType = await res.json();
+    setWorker(wData);
+
+    if (wData.companyId) {
+      const res = await fetch(`/api/company/${wData?.companyId}`);
+      const workCompany = await res.json();
+      if (res.ok || workCompany.length > 0) {
+        setCompany(workCompany);
+      } else {
+        console.log(
+          "ajilgu worker bnoo :( ajilguidel ch ih hetsuu shuuuu, ajild avchaachee",
+        );
+      }
+    }
   };
-  console.log(worker);
+
+  const getWorkerApplications = async () => {
+    const res = await fetch(`/api/worker/${workerId}`);
+    const wApplicationData = await res.json();
+    setWApplications(wApplicationData);
+  };
+
+  const getTimeSchedule = async () => {
+    const res = await fetch("/api/worker/getWorkerSchedule", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ workerId }),
+    });
+    const response = await res.json();
+    setTimeSchedule(response);
+  };
+
+  const timeSlots: string[] = [];
+
+  if (timeSchedule?.startTime && timeSchedule?.endTime) {
+    const startHour = Number(timeSchedule.startTime.split(":")[0]);
+    const endHour = Number(timeSchedule.endTime.split(":")[0]);
+
+    for (let hour = startHour; hour < endHour; hour++) {
+      const from = String(hour).padStart(2, "0") + ":00";
+      const to = String(hour + 1).padStart(2, "0") + ":00";
+      timeSlots.push(`${from}-${to}`);
+    }
+    console.log(startHour, endHour);
+  }
+  console.log(timeSchedule);
+  console.log(timeSlots);
 
   useEffect(() => {
     getWorker();
+    getTimeSchedule();
+    getWorkerApplications();
   }, []);
 
   return (
@@ -62,16 +117,22 @@ export default function WorkerPanel() {
         </div>
 
         <nav className="flex flex-col gap-2">
-          <NavItem
-            icon={<LayoutDashboard size={20} />}
-            label="Dashboard"
-            active
-          />
-          <div onClick={() => push(`/dashboard/worker/${workerId}/profile`)}>
-            <NavItem icon={<Users size={20} />} label="Workers" />
-          </div>
           <div onClick={() => push(`/dashboard/worker/${workerId}`)}>
-            <NavItem icon={<Activity size={20} />} label="Analytics" />
+            <NavItem
+              icon={<LayoutDashboard size={20} />}
+              label="Dashboard"
+              active
+            />
+          </div>
+          <div onClick={() => push(`/dashboard/worker/${workerId}/profile`)}>
+            <NavItem icon={<Users size={20} />} label="Profile" />
+          </div>
+          <div
+            onClick={() =>
+              push("/dashboard/worker/${workerId}/workers/${companyId}")
+            }
+          >
+            <NavItem icon={<Users size={20} />} label="Workers" />
           </div>
           <div onClick={() => push(`/dashboard/worker/${workerId}/settings`)}>
             <NavItem icon={<Settings size={20} />} label="Settings" />
@@ -105,62 +166,105 @@ export default function WorkerPanel() {
             </button>
           </div>
         </header>
-
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 h-60">
-          <StatCard title="Active Workers" value="1,284" change="+12%" />
-          <StatCard
-            title="System Load"
-            value="42.5%"
-            change="-3%"
-            color="text-purple-400"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 ">
+          <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30 h-60">
+            <CardContent className="text-white ">
+              <div className="flex text-white justify-start">
+                <img
+                  className="aspect-square object-cover w-10 h-10 border-2 rounded-full border-border"
+                  src={worker?.profilePicture}
+                />
+                <div className="ml-3 mt-2">{worker?.name}</div>
+              </div>
+              <hr className=" mt-4  " />
+              <p className="text-white mt-4">
+                Утасны дугаар: {worker?.phoneNumber}
+              </p>
+              <div>
+                Ажлын туршлага:
+                <span className="text-xs font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded">
+                  {worker?.experience}
+                </span>
+              </div>
+              <div>Санал хүсэлт: {worker?.feedback[0]}</div>
+            </CardContent>
+          </Card>
+          {company ? (
+            <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30 h-70">
+              <CardContent className="text-white ">
+                <img
+                  className="h-[50px] w-[100px] object-contain flex justify-center"
+                  src={company.image}
+                />
+                <div className="flex text-white justify-start">
+                  <div className="ml-3 mt-2">{company?.name}</div>
+                </div>
+                <p className="text-white mt-4">Хаяг: {company?.location}</p>
+                <div>
+                  Цагийн хуваарь:
+                  <span className="text-xs font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded">
+                    WORKING HOURS GO HERE
+                  </span>
+                </div>
+                <div>Санал хүсэлт: {worker?.feedback[0]}</div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30">
+              <CardContent className="text-white ">
+                <div className="flex text-white justify-start">
+                  Таны явуулсан хүсэлтийг компани тань арай хүлээн зөвшөөрөөгүй
+                  байна.
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
-        {/* Data Table Section */}
-        <Card className="bg-black/40 border-purple-900/30 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-purple-100 text-lg">
-              Recent Worker Logs
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader className="border-purple-900/50">
-                <TableRow>
-                  <TableHead className="text-purple-400/70">ID</TableHead>
-                  <TableHead className="text-purple-400/70">
-                    Worker Name
-                  </TableHead>
-                  <TableHead className="text-purple-400/70">Status</TableHead>
-                  <TableHead className="text-purple-400/70 text-right">
-                    Uptime
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <WorkerRow
-                  id="#WRK-001"
-                  name="Alpha-Node"
-                  status="Active"
-                  uptime="14d 2h"
-                />
-                <WorkerRow
-                  id="#WRK-042"
-                  name="Omega-Stream"
-                  status="Standby"
-                  uptime="02d 5h"
-                />
-                <WorkerRow
-                  id="#WRK-099"
-                  name="Zeta-Core"
-                  status="Error"
-                  uptime="-- --"
-                />
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        <div>
+          <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30 backdrop-blur-xl">
+            <CardContent className="p-6">
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-white">
+                  Working Schedule
+                </h2>
+                <p className="text-sm text-slate-400 mt-1">
+                  {timeSchedule?.day}
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                {timeSlots.length > 0 ? (
+                  timeSlots.map((slot, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center px-4 py-3 rounded-lg 
+                       bg-black/40 border border-purple-900/20
+                       hover:bg-purple-900/10 transition-all"
+                    >
+                      <span className="font-mono text-sm text-slate-300">
+                        {slot}
+                      </span>
+
+                      <span
+                        className="text-xs px-3 py-1 rounded-full 
+                             bg-purple-500/20 text-purple-400 
+                             border border-purple-500/30"
+                      >
+                        Available
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-slate-500 text-sm">
+                    No schedule assigned yet.
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </main>
     </div>
   );
@@ -191,34 +295,6 @@ function NavItem({
       {icon}
       <span className="font-medium">{label}</span>
     </div>
-  );
-}
-
-function StatCard({
-  title,
-  value,
-  change,
-  color = "text-white",
-}: {
-  title: string;
-  value: string;
-  change: string;
-  color?: string;
-}) {
-  return (
-    <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30">
-      <CardContent className="">
-        <CircleUser color="#FFF" width={45} height={45} />
-        <div></div>
-        <p className="text-sm text-slate-500 mb-1">{title}</p>
-        <div className="flex items-end justify-between">
-          <h2 className={`text-3xl font-bold ${color}`}>{value}</h2>
-          <span className="text-xs font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded">
-            {change}
-          </span>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
 

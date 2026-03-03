@@ -1,15 +1,114 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Company {
+  id            String              @id @default(nanoid())
+  name          String
+  typeOfCompany String
+  location      String?
+  feedback      String?
+  createdAt     DateTime            @default(now())
+  openTime      String
+  closeTime     String
+  image         String?
+  adminId       String?
+  appointments  Appointment[]
+  admin         Admin?              @relation(fields: [adminId], references: [id])
+  timeSchedules TimeSchedule[]
+  users         User[]
+  workers       Worker[]
+  applications  WorkerApplication[]
+}
+
+model Worker {
+  id             String              @id @default(nanoid())
+  email          String              @unique
+  name           String
+  phoneNumber    String?
+  role           Role                @default(WORKER)
+  experience     String
+  feedback       String[]
+  companyId      String?
+  clerkId        String?             @unique 
+  profilePicture String?
+  appointments   Appointment[]
+  timeSchedules  TimeSchedule[]
+  company        Company?            @relation(fields: [companyId], references: [id])
+  applications   WorkerApplication[]
+}
+
+model User {
+  id           String        @id @default(nanoid())
+  email        String        @unique
+  clerkId      String        @unique
+  name         String
+  role         Role          @default(USER)
+  companyId    String?
+  appointments Appointment[]
+  company      Company?      @relation(fields: [companyId], references: [id])
+}
+
+model Admin {
+  id          String    @id @default(nanoid())
+  name        String
+  email       String    @unique
+  phoneNumber String?
+  clerkId     String?   @unique
+  companies   Company[]
+}
+
+model TimeSchedule {
+  id           String   @id @default(nanoid())
+  day          Day
+  companyId    String?
+  workerId     String?
+  startTime    String
+  endTime      String
+  slotInterval Int      @default(60)
+  company      Company? @relation(fields: [companyId], references: [id])
+  worker       Worker?  @relation(fields: [workerId], references: [id])
+}
+
+model WorkerApplication {
+  id          String              @id @default(nanoid())
+  workerId    String
+  companyId   String
+  status      WorkerRequestStatus @default(PENDING)
+  createdAt   DateTime            @default(now())
+  decidedAt   DateTime?
+  reason      String?
+  decidedById String?
+  company     Company             @relation(fields: [companyId], references: [id])
+  worker      Worker              @relation(fields: [workerId], references: [id])
+
+  @@unique([workerId, companyId])
+  @@index([companyId, status])
+  @@index([workerId, status])
+}
+
+model Appointment {
+  id           String            @id @default(nanoid())
+  userId       String
+  workerId     String
+  companyId    String
+  startAt      DateTime
+  endAt        DateTime
+  status       AppointmentStatus @default(BOOKED)
+  createdAt    DateTime          @default(now())
+  cancelledAt  DateTime?
+  cancelReason String?
+  company      Company           @relation(fields: [companyId], references: [id])
+  user         User              @relation(fields: [userId], references: [id])
+  worker       Worker            @relation(fields: [workerId], references: [id])
+
+  @@index([workerId, startAt])
+  @@index([userId, startAt])
+  @@index([companyId, startAt])
 }
 
 enum Role {
@@ -39,119 +138,4 @@ enum AppointmentStatus {
   CANCELLED
   COMPLETED
   NO_SHOW
-}
-
-model Company {
-  id            String   @id @default(nanoid())
-  name          String
-  typeOfCompany String
-  location      String?
-  feedback      String?
-  createdAt     DateTime @default(now())
-  openTime      String
-  closeTime     String
-  image         String?
-
-  workers      Worker[]
-  applications WorkerApplication[]
-
-  timeSchedules TimeSchedule[]
-  users         User[]
-
-  admin        Admin?        @relation(fields: [adminId], references: [id])
-  adminId      String?
-  appointments Appointment[]
-}
-
-model Worker {
-  id             String   @id @default(nanoid())
-  email          String   @unique
-  clerkId        String?  @unique
-  name           String
-  phoneNumber    String?
-  experience     String
-  feedback       String[]
-  profilePicture String?
-
-  companyId String?
-  company   Company? @relation(fields: [companyId], references: [id])
-
-  applications  WorkerApplication[]
-  timeSchedules TimeSchedule[]
-  appointments  Appointment[]
-}
-
-model User {
-  id           String        @id @default(nanoid())
-  name         String
-  email        String        @unique
-  role         Role          @default(USER)
-  clerkId      String        @unique
-  company      Company?      @relation(fields: [companyId], references: [id])
-  companyId    String?
-  appointments Appointment[]
-}
-
-model Admin {
-  id          String  @id @default(nanoid())
-  clerkId     String? @unique
-  name        String
-  email       String  @unique
-  phoneNumber String?
-
-  companies Company[]
-}
-
-model TimeSchedule {
-  id           String   @id @default(nanoid())
-  day          Day
-  startTime    String
-  endTime      String
-  slotInterval Int      @default(60)
-  company      Company? @relation(fields: [companyId], references: [id])
-  companyId    String?
-  worker       Worker?  @relation(fields: [workerId], references: [id])
-  workerId     String?
-}
-
-model WorkerApplication {
-  id        String              @id @default(nanoid())
-  workerId  String
-  companyId String
-  status    WorkerRequestStatus @default(PENDING)
-
-  createdAt   DateTime  @default(now())
-  decidedAt   DateTime?
-  reason      String?
-  decidedById String?
-
-  worker  Worker  @relation(fields: [workerId], references: [id])
-  company Company @relation(fields: [companyId], references: [id])
-
-  @@unique([workerId, companyId])
-  @@index([companyId, status])
-  @@index([workerId, status])
-}
-
-model Appointment {
-  id        String @id @default(nanoid())
-  userId    String
-  workerId  String
-  companyId String
-
-  startAt DateTime
-  endAt   DateTime
-  status  AppointmentStatus @default(BOOKED)
-
-  createdAt    DateTime  @default(now())
-  cancelledAt  DateTime?
-  cancelReason String?
-
-  user    User    @relation(fields: [userId], references: [id])
-  worker  Worker  @relation(fields: [workerId], references: [id])
-  company Company @relation(fields: [companyId], references: [id])
-
-  @@index([workerId, startAt])
-  @@index([userId, startAt])
-  @@index([companyId, startAt])
 }

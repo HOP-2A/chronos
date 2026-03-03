@@ -13,6 +13,7 @@ export default function CreateWorkerPage() {
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [experience, setExperience] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +26,7 @@ export default function CreateWorkerPage() {
         name,
         phoneNumber,
         experience,
+        password,
       }),
     });
 
@@ -34,6 +36,7 @@ export default function CreateWorkerPage() {
       setName("");
       setPhoneNumber("");
       setExperience("");
+      setPassword("");
       const worker = await res.json();
       push(`/dashboard/worker/${worker.worker.id}`);
     } else {
@@ -106,6 +109,19 @@ export default function CreateWorkerPage() {
               type="text"
               value={experience}
               onChange={(e) => setExperience(e.target.value)}
+              placeholder="React, Design, Management"
+              className="w-full p-3 rounded-lg border border-white/[0.05] bg-white/[0.02] text-gray-200 placeholder:text-gray-700 focus:outline-none focus:ring-1 focus:ring-white/20 transition-all text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2">
+              Password
+            </label>
+            <input
+              type="text"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="React, Design, Management"
               className="w-full p-3 rounded-lg border border-white/[0.05] bg-white/[0.02] text-gray-200 placeholder:text-gray-700 focus:outline-none focus:ring-1 focus:ring-white/20 transition-all text-sm"
             />

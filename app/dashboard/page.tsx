@@ -26,7 +26,7 @@ const Page = () => {
       const data = await res.json();
 
       if (data.role === "WORKER") {
-        push(`/dashboard/worker/${data.id}/`);
+        push(`/dashboard/worker/${user.id}/`);
       }
 
       if (data.role === "USER") {

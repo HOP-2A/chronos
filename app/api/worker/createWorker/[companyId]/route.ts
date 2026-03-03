@@ -18,13 +18,13 @@ export const POST = async (
     }
 
     const { email, name, phoneNumber, experience, password } = await req.json();
-    const existingWorker = prisma.worker.findFirst({
+    const existingWorker = await prisma.worker.findFirst({
       where: {
         email,
       },
     });
 
-    if (!existingWorker) {
+    if (existingWorker) {
       return NextResponse.json(
         { error: "Worker already exist" },
         { status: 400 },
@@ -39,6 +39,7 @@ export const POST = async (
       skipPasswordRequirement: false,
       publicMetadata: { role: Role.WORKER },
     });
+    
     const company = await prisma.company.findUnique({
       where: { id: companyId },
     });
@@ -55,7 +56,7 @@ export const POST = async (
         name,
         phoneNumber,
         experience,
-        clerkId,
+        clerkId: clerkUser.id,
         role: Role.WORKER,
       },
     });

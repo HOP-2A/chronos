@@ -3,10 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { LayoutDashboard, Users, Settings, Search, Bell } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  TableCell,
-  TableRow,
-} from "@/components/ui/table";
+import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useParams, useRouter } from "next/navigation";
 import { CompanyType } from "../../user/[userId]/page";

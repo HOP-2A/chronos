@@ -4,15 +4,7 @@ import * as React from "react";
 import { ChangeEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import {
-  Building2,
-  MapPin,
-  Briefcase,
-  Clock,
-  PlusCircle,
-  ChevronDownIcon,
-} from "lucide-react";
+import { Building2, MapPin, Briefcase, Clock, PlusCircle } from "lucide-react";
 
 import { upload } from "@vercel/blob/client";
 
@@ -24,9 +16,10 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 
-import { TimePicker } from "../_component/TimePicker";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
+import { useUser } from "@clerk/nextjs";
 
 type CompanyInfo = {
   name: string;
@@ -72,9 +65,8 @@ export default function Page() {
   });
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [date, setDate] = React.useState<Date>();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [status, setStatus] = useState("x ");
+  const clerkId = useUser();
 
   const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -96,6 +88,7 @@ export default function Page() {
         image: info.image,
         openTime: info.openTime,
         closeTime: info.closeTime,
+        adminId: clerkId.user?.id,
       };
 
       const res = await fetch("/api/company", {
@@ -168,7 +161,6 @@ export default function Page() {
     info.openTime !== "" &&
     info.closeTime !== "" &&
     !timesInvalid;
-
   return (
     <div className="relative min-h-screen overflow-hidden text-white bg-[#0f1014]">
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl z-50 rounded-full border border-white/10 bg-black/40 backdrop-blur-2xl px-6 py-3 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)]">

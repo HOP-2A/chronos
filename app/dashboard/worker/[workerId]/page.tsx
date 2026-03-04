@@ -1,16 +1,27 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { LayoutDashboard, Users, Settings, Search, Bell } from "lucide-react";
+import { useParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import { TableCell, TableRow } from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { useParams, useRouter } from "next/navigation";
-import { CompanyType } from "../../user/[userId]/page";
-import { Day } from "@prisma/client";
-import { DayOption, Schedule } from "../workerTimeSchedule/[workerId]/page";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Briefcase,
+  Calendar,
+  MessageSquare,
+  User,
+  Settings,
+  LogOut,
+} from "lucide-react";
 
-type WorkerType = {
+// Assuming types for the complex nested objects
+type Day = string | Date;
+type DayOption = string;
+
+export type WorkerType = {
   id: string;
   name: string;
   email: string;
@@ -41,295 +52,221 @@ type WorkerType = {
   };
 };
 
-export default function WorkerPanel() {
-  const { push } = useRouter();
+const Page = () => {
   const params = useParams();
   const workerId = params.workerId;
   const [worker, setWorker] = useState<WorkerType>();
-  const [wApplications, setWApplications] = useState([]);
-  const [timeSchedule, setTimeSchedule] = useState<Schedule>();
-  const [company, setCompany] = useState<CompanyType>();
 
-  const getWorker = async () => {
+  const getOneWorker = async () => {
     const res = await fetch(`/api/worker/${workerId}`);
-    const wData: WorkerType = await res.json();
-    setWorker(wData);
-
-    if (wData.companyId) {
-      const res = await fetch(`/api/company/${wData?.companyId}`);
-      const workCompany = await res.json();
-      if (res.ok || workCompany.length > 0) {
-        setCompany(workCompany);
-      } else {
-        console.log(
-          "ajilgu worker bnoo :( ajilguidel ch ih hetsuu shuuuu, ajild avchaachee",
-        );
-      }
-    }
-  };
-
-  const getWorkerApplications = async () => {
-    const res = await fetch(`/api/worker/${workerId}`);
-    const wApplicationData = await res.json();
-    setWApplications(wApplicationData);
-  };
-
-  const getTimeSchedule = async () => {
-    const res = await fetch("/api/worker/getWorkerSchedule", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ workerId }),
-    });
     const response = await res.json();
-    setTimeSchedule(response);
+    setWorker(response);
   };
-
-  const timeSlots: string[] = [];
-
-  if (timeSchedule?.startTime && timeSchedule?.endTime) {
-    const startHour = Number(timeSchedule.startTime.split(":")[0]);
-    const endHour = Number(timeSchedule.endTime.split(":")[0]);
-
-    for (let hour = startHour; hour < endHour; hour++) {
-      const from = String(hour).padStart(2, "0") + ":00";
-      const to = String(hour + 1).padStart(2, "0") + ":00";
-      timeSlots.push(`${from}-${to}`);
-    }
-    console.log(startHour, endHour);
-  }
-  console.log(timeSchedule);
-  console.log(timeSlots);
 
   useEffect(() => {
-    getWorker();
-    getTimeSchedule();
-    getWorkerApplications();
+    getOneWorker();
   }, []);
 
+  if (!worker) return <div className="min-h-screen bg-black" />;
+
   return (
-    <div className="flex min-h-screen bg-black text-slate-200 font-sans">
-      <aside className="w-64 border-r border-purple-900/30 bg-black/50 backdrop-blur-xl p-6 flex flex-col gap-8">
-        <div className="flex items-center gap-2 px-2">
-          <div className="h-8 w-8 rounded-lg bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)]" />
-          <span className="text-xl font-bold tracking-tight text-white">
-            CORE<span className="text-purple-500">.io</span>
-          </span>
+    <div className="w-full min-h-screen bg-black text-zinc-300 font-sans pb-12">
+      {/* Top Banner Area - Matches the screenshot's dark header */}
+      <div className="w-full h-64 bg-gradient-to-b from-zinc-900 to-black relative border-b border-zinc-800">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+        <div className="max-w-7xl mx-auto h-full flex items-end pb-12 px-8">
+          <h2 className="text-2xl font-light text-zinc-400">
+            Welcome back,{" "}
+            <span className="text-purple-400 font-semibold">{worker.name}</span>
+          </h2>
         </div>
+      </div>
 
-        <nav className="flex flex-col gap-2">
-          <div onClick={() => push(`/dashboard/worker/${workerId}`)}>
-            <NavItem
-              icon={<LayoutDashboard size={20} />}
-              label="Dashboard"
-              active
-            />
-          </div>
-          <div onClick={() => push(`/dashboard/worker/${workerId}/profile`)}>
-            <NavItem icon={<Users size={20} />} label="Profile" />
-          </div>
-          <div
-            onClick={() =>
-              push("/dashboard/worker/${workerId}/workers/${companyId}")
-            }
-          >
-            <NavItem icon={<Users size={20} />} label="Workers" />
-          </div>
-          <div onClick={() => push(`/dashboard/worker/${workerId}/settings`)}>
-            <NavItem icon={<Settings size={20} />} label="Settings" />
-          </div>
-        </nav>
-      </aside>
-      ;{/* --- Main Content --- */}
-      <main className="flex-1 p-8 overflow-y-auto">
-        {/* Header */}
-        <header className="flex justify-between items-center mb-10">
-          <div>
-            <div>
-              <h1 className="text-3xl font-bold text-white tracking-tight">
-                {worker?.name}
-              </h1>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
+      {/* Main Content Container */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 -mt-16">
+        {/* Profile Floating Bar */}
+        <Card className="bg-zinc-950/80 border-zinc-800 backdrop-blur-xl mb-8 shadow-2xl">
+          <CardContent className="p-6 flex flex-col md:flex-row items-center gap-8">
             <div className="relative">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-                size={18}
-              />
-              <input
-                className="bg-purple-950/20 border border-purple-900/30 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
-                placeholder="Search metrics..."
-              />
+              <Avatar className="w-32 h-32 border-4 border-black shadow-lg shadow-purple-900/20">
+                <AvatarImage src={worker.profilePicture} />
+                <AvatarFallback className="bg-purple-900 text-white text-3xl">
+                  {worker.name[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute bottom-1 right-1 bg-purple-600 p-2 rounded-full border-2 border-black">
+                <Settings className="w-4 h-4 text-white" />
+              </div>
             </div>
-            <button className="p-2 rounded-full bg-purple-900/20 border border-purple-800/40 text-purple-400 hover:bg-purple-800/30 transition-colors">
-              <Bell size={20} />
-            </button>
-          </div>
-        </header>
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 ">
-          <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30 h-60">
-            <CardContent className="text-white ">
-              <div className="flex text-white justify-start">
-                <img
-                  className="aspect-square object-cover w-10 h-10 border-2 rounded-full border-border"
-                  src={worker?.profilePicture}
-                />
-                <div className="ml-3 mt-2">{worker?.name}</div>
-              </div>
-              <hr className=" mt-4  " />
-              <p className="text-white mt-4">
-                Утасны дугаар: {worker?.phoneNumber}
-              </p>
-              <div>
-                Ажлын туршлага:
-                <span className="text-xs font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded">
-                  {worker?.experience}
-                </span>
-              </div>
-              <div>Санал хүсэлт: {worker?.feedback[0]}</div>
-            </CardContent>
-          </Card>
-          {company ? (
-            <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30 h-70">
-              <CardContent className="text-white ">
-                <img
-                  className="h-[50px] w-[100px] object-contain flex justify-center"
-                  src={company.image}
-                />
-                <div className="flex text-white justify-start">
-                  <div className="ml-3 mt-2">{company?.name}</div>
-                </div>
-                <p className="text-white mt-4">Хаяг: {company?.location}</p>
-                <div>
-                  Цагийн хуваарь:
-                  <span className="text-xs font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded">
-                    WORKING HOURS GO HERE
-                  </span>
-                </div>
-                <div>Санал хүсэлт: {worker?.feedback[0]}</div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30">
-              <CardContent className="text-white ">
-                <div className="flex text-white justify-start">
-                  Таны явуулсан хүсэлтийг компани тань арай хүлээн зөвшөөрөөгүй
-                  байна.
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
 
-        <div>
-          <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30 backdrop-blur-xl">
-            <CardContent className="p-6">
-              <div className="mb-6">
-                <h2 className="text-xl font-semibold text-white">
-                  Working Schedule
-                </h2>
-                <p className="text-sm text-slate-400 mt-1">
-                  {timeSchedule?.day}
+            {/* Quick Stats Grid - Matching the boxes in your image */}
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+              {[
+                {
+                  label: "Applications",
+                  val: worker.applications.length,
+                  icon: Briefcase,
+                },
+                {
+                  label: "Feedbacks",
+                  val: worker.feedback.length,
+                  icon: MessageSquare,
+                },
+                { label: "Exp. Level", val: "Senior", icon: StarIcon },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="bg-zinc-900/50 p-4 rounded-xl border border-zinc-800 flex items-center gap-4"
+                >
+                  <div className="p-3 bg-purple-900/20 rounded-lg">
+                    <item.icon className="w-5 h-5 text-purple-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-zinc-500 uppercase font-bold">
+                      {item.label}
+                    </p>
+                    <p className="text-xl font-bold text-white">{item.val}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button className="flex items-center gap-2 text-zinc-500 hover:text-red-400 transition-colors">
+              <LogOut className="w-5 h-5" />
+              <span className="font-medium">Logout</span>
+            </button>
+          </CardContent>
+        </Card>
+
+        {/* Layout Grid: Profile Info & Sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Information Form Section (Left & Middle) */}
+          <div className="lg:col-span-2 space-y-8">
+            <section>
+              <div className="flex items-center justify-between mb-4 border-b border-purple-900/30 pb-2">
+                <h3 className="text-xl font-semibold text-white">
+                  Personal Information
+                </h3>
+                <div className="h-1 w-16 bg-purple-600 rounded-full" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <InfoBox
+                  label="Full Name"
+                  value={worker.name}
+                  icon={<User className="w-4 h-4" />}
+                />
+                <InfoBox
+                  label="Email Address"
+                  value={worker.email}
+                  icon={<Mail className="w-4 h-4" />}
+                />
+                <InfoBox
+                  label="Phone Number"
+                  value={worker.phoneNumber.toString()}
+                  icon={<Phone className="w-4 h-4" />}
+                />
+                <InfoBox
+                  label="Company ID"
+                  value={worker.companyId}
+                  icon={<Briefcase className="w-4 h-4" />}
+                />
+              </div>
+            </section>
+
+            <section>
+              <div className="flex items-center justify-between mb-4 border-b border-purple-900/30 pb-2">
+                <h3 className="text-xl font-semibold text-white">
+                  Experience & Bio
+                </h3>
+                <div className="h-1 w-16 bg-purple-600 rounded-full" />
+              </div>
+              <div className="bg-zinc-950 border border-zinc-800 p-6 rounded-xl">
+                <p className="text-zinc-400 leading-relaxed italic">
+                  "{worker.experience}"
                 </p>
               </div>
+            </section>
+          </div>
 
-              <div className="flex flex-col gap-3">
-                {timeSlots.length > 0 ? (
-                  timeSlots.map((slot, index) => (
-                    <div
-                      key={index}
-                      className="flex justify-between items-center px-4 py-3 rounded-lg 
-                       bg-black/40 border border-purple-900/20
-                       hover:bg-purple-900/10 transition-all"
-                    >
-                      <span className="font-mono text-sm text-slate-300">
-                        {slot}
-                      </span>
-
-                      <span
-                        className="text-xs px-3 py-1 rounded-full 
-                             bg-purple-500/20 text-purple-400 
-                             border border-purple-500/30"
-                      >
-                        Available
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-slate-500 text-sm">
-                    No schedule assigned yet.
-                  </div>
-                )}
+          {/* Sidebar Section (Right) */}
+          <div className="space-y-6">
+            <Card className="bg-zinc-950 border-zinc-800 overflow-hidden">
+              <div className="bg-purple-900/20 p-4 border-b border-zinc-800">
+                <h4 className="text-white font-bold flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-purple-500" />
+                  Work Schedule
+                </h4>
               </div>
-            </CardContent>
-          </Card>
+              <CardContent className="p-6">
+                <div className="flex flex-col gap-4">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Day</span>
+                    <Badge
+                      variant="secondary"
+                      className="bg-zinc-800 text-purple-400"
+                    >
+                      {worker.timeSchedule.day}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Hours</span>
+                    <span className="text-white font-mono">
+                      {worker.timeSchedule.startTime} -{" "}
+                      {worker.timeSchedule.endTime}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-zinc-950 border-zinc-800">
+              <CardContent className="p-6">
+                <h4 className="text-white font-bold mb-4">Latest Feedback</h4>
+                <div className="space-y-4">
+                  {worker.feedback.slice(0, 2).map((text, i) => (
+                    <div
+                      key={i}
+                      className="text-sm text-zinc-500 border-l-2 border-purple-600 pl-4 py-1"
+                    >
+                      {text}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
-}
+};
 
-// --- Sub-components for cleaner code ---
-
-function NavItem({
-  icon,
+// Reusable Sub-component for the info boxes
+const InfoBox = ({
   label,
-  active = false,
+  value,
+  icon,
 }: {
-  icon: React.ReactNode;
   label: string;
-  active?: boolean;
-}) {
-  return (
-    <div
-      className={`
-      flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200
-      ${
-        active
-          ? "bg-purple-600/20 text-purple-400 border border-purple-500/30 shadow-[inset_0_0_10px_rgba(168,85,247,0.1)]"
-          : "text-slate-500 hover:text-purple-300 hover:bg-purple-900/10"
-      }
-    `}
-    >
-      {icon}
-      <span className="font-medium">{label}</span>
+  value: string;
+  icon: React.ReactNode;
+}) => (
+  <div className="space-y-2">
+    <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
+      {label}
+    </label>
+    <div className="flex items-center gap-3 bg-zinc-950 border border-zinc-800 p-4 rounded-xl focus-within:border-purple-500 transition-all">
+      <span className="text-purple-500">{icon}</span>
+      <span className="text-zinc-200">{value}</span>
     </div>
-  );
-}
+  </div>
+);
 
-function WorkerRow({
-  id,
-  name,
-  status,
-  uptime,
-}: {
-  id: string;
-  name: string;
-  status: string;
-  uptime: string;
-}) {
-  const statusColors: any = {
-    Active: "bg-purple-500/20 text-purple-400 border-purple-500/50",
-    Standby: "bg-slate-800 text-slate-400 border-slate-700",
-    Error: "bg-red-950/30 text-red-500 border-red-900/50",
-  };
+const StarIcon = ({ className }: { className?: string }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 20 20">
+    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+  </svg>
+);
 
-  return (
-    <TableRow className="border-purple-900/20 hover:bg-purple-900/5 transition-colors">
-      <TableCell className="font-mono text-xs text-slate-500">{id}</TableCell>
-      <TableCell className="font-medium text-slate-200">{name}</TableCell>
-      <TableCell>
-        <Badge
-          variant="outline"
-          className={`${statusColors[status]} font-normal`}
-        >
-          {status}
-        </Badge>
-      </TableCell>
-      <TableCell className="text-right text-slate-400 font-mono text-sm">
-        {uptime}
-      </TableCell>
-    </TableRow>
-  );
-}
+export default Page;

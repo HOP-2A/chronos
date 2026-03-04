@@ -32,6 +32,11 @@ const Page = () => {
     });
   };
 
+  const deleteWorker = async () => {
+    const response = await fetch(`/api/worker/${workerId}`, {
+      method: "DELETE",
+    });
+  };
   console.log(worker);
 
   useEffect(() => {

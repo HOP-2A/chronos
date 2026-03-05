@@ -87,25 +87,31 @@ export default function ChronosPrestige() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <WorkerLiquidCard
-              name="Төгөлдөр"
-              specialty="стратеги"
-              slots={["09:00", "11:00", "14:00"]}
-              price="$150"
-            />
-            <WorkerLiquidCard
-              name="Номин"
-              specialty="инженерчлэл"
-              slots={["10:00", "13:00", "16:00"]}
-              price="$220"
-              active
-            />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <WorkerLiquidCard
               name="Төрболд"
               specialty="дизайн"
               slots={["08:00", "12:00", "15:00"]}
               price="$180"
+              active
+            />
+            <WorkerLiquidCard
+              name="Зэлэм"
+              specialty="стратеги"
+              slots={["09:00", "11:00", "14:00"]}
+              price="$150"
+            />
+            <WorkerLiquidCard
+              name="Болорсайхан"
+              specialty="инженерчлэл"
+              slots={["10:00", "13:00", "16:00"]}
+              price="$250"
+            />
+            <WorkerLiquidCard
+              name="Энхсайхан"
+              specialty="инженерчлэл"
+              slots={["10:00", "13:00", "16:00"]}
+              price="$220"
             />
           </div>
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useUser } from "@clerk/nextjs";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -25,15 +26,18 @@ type Schedule = {
 export default function Page() {
   const params = useParams();
   const workerId = String(params.workerId);
+  const { user } = useUser();
 
   const [workerSchedule, setWorkerSchedule] = useState<Schedule[]>([]);
   const [workerInfo, setWorkerInfo] = useState<any>(null);
   const [day, setDay] = useState<DayOption>("MONDAY");
   const [isLoading, setIsLoading] = useState(true);
+
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(
+  const [selectedStartTime, setSelectedStartTime] = useState<string | null>(
     null,
   );
+  const [selectedEndTime, setSelectedEndTime] = useState<string | null>(null);
 
   const getWorkerSchedule = async (workerId: string) => {
     try {
@@ -44,8 +48,7 @@ export default function Page() {
       });
 
       if (res.ok) {
-        const data = await res.json();
-        setWorkerSchedule(data);
+        setWorkerSchedule(await res.json());
       }
     } catch (err) {
       console.error(err);
@@ -56,19 +59,17 @@ export default function Page() {
     const res = await fetch(`/api/worker/${workerId}`);
 
     if (res.ok) {
-      const data = await res.json();
-      setWorkerInfo(data);
+      setWorkerInfo(await res.json());
     }
   };
 
   useEffect(() => {
-    const loadData = async () => {
-      if (!workerId) return;
+    if (!workerId) return;
 
+    const loadData = async () => {
       setIsLoading(true);
 
-      await getWorkerSchedule(workerId);
-      await workerDetails(workerId);
+      await Promise.all([getWorkerSchedule(workerId), workerDetails(workerId)]);
 
       setIsLoading(false);
     };
@@ -76,19 +77,12 @@ export default function Page() {
     loadData();
   }, [workerId]);
 
-  const filteredSchedule = workerSchedule.filter((info) => info.day === day);
-
-  const handleOpenDialog = (schedule: Schedule) => {
-    setSelectedSchedule(schedule);
-    setOpenDialog(true);
-  };
-
   const generateSlots = (
     startTime: string,
     endTime: string,
     interval: number,
   ) => {
-    const slots = [];
+    const slots: string[] = [];
 
     const [startHour, startMinute] = startTime.split(":").map(Number);
     const [endHour, endMinute] = endTime.split(":").map(Number);
@@ -107,43 +101,55 @@ export default function Page() {
     return slots;
   };
 
+  const addMinutesToTime = (time: string, minutes: number) => {
+    const [h, m] = time.split(":").map(Number);
+
+    const date = new Date();
+    date.setHours(h, m, 0, 0);
+    date.setMinutes(date.getMinutes() + minutes);
+
+    return date.toTimeString().slice(0, 5);
+  };
+
+  const sendOrder = async () => {
+    if (!selectedStartTime || !selectedEndTime || !workerInfo) return;
+
+    const res = await fetch("/api/appointment/timeSchedule", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        companyId: workerInfo.companyId,
+        workerId,
+        userId: user?.id,
+        startAt: selectedStartTime,
+        endAt: selectedEndTime,
+      }),
+    });
+
+    if (res.ok) {
+      alert("Booked successfully!");
+      setOpenDialog(false);
+    }
+  };
+
+  const filteredSchedule = workerSchedule.filter((info) => info.day === day);
+
   return (
     <div className="min-h-screen w-full bg-[#0A0A0A] text-gray-100">
       {isLoading && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xl z-50 flex items-center justify-center">
-          <div className="text-white text-sm tracking-widest animate-pulse">
-            LOADING
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-50 flex items-center justify-center">
+          <div className="text-white tracking-widest animate-pulse">
+            Ачааллаж байна...
           </div>
         </div>
       )}
-      {openDialog && selectedSchedule && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-50 flex items-center justify-center p-6">
-          <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 w-full max-w-md space-y-6">
-            <h2 className="text-xl font-semibold tracking-tight">
-              Schedule Detail
-            </h2>
-
-            <div className="space-y-2 text-gray-300 font-mono">
-              <p>Day: {selectedSchedule.day}</p>
-              <p>
-                Time: {selectedSchedule.startTime} — {selectedSchedule.endTime}
-              </p>
-            </div>
-
-            <button
-              onClick={() => setOpenDialog(false)}
-              className="w-full py-3 bg-white text-black text-xs uppercase tracking-widest rounded-xl hover:bg-gray-200 transition"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-
       <div className="relative h-[40vh] w-full">
         {workerInfo?.profilePicture && (
           <img
             src={workerInfo.profilePicture}
+            alt="profile"
             className="w-full h-full object-cover"
           />
         )}
@@ -157,16 +163,13 @@ export default function Page() {
 
           <div className="flex flex-wrap gap-6 mt-4 text-gray-400">
             <span>⭐ {workerInfo?.experience}</span>
-
             <span>📞 {workerInfo?.phoneNumber}</span>
           </div>
         </div>
       </div>
       <div className="max-w-7xl mx-auto w-full px-6 sm:px-12 lg:px-24 py-14 space-y-20">
         <div className="space-y-6">
-          <p className="text-lg text-gray-500">
-            Select weekday to view schedule
-          </p>
+          <p className="text-lg text-gray-500">Ажлын өдрийг сонгоно уу</p>
 
           <div className="flex flex-wrap gap-3">
             {[
@@ -181,10 +184,10 @@ export default function Page() {
               <button
                 key={d}
                 onClick={() => setDay(d as DayOption)}
-                className={`px-6 py-2 text-xs font-bold uppercase tracking-wider border rounded-full transition-all
+                className={`px-6 py-2 text-xs font-bold uppercase tracking-wider border rounded-full transition-all cursor-pointer
                 ${
                   day === d
-                    ? "bg-white text-black border-white"
+                    ? "bg-purple-500 text-black border-purple-600"
                     : "border-white/[0.1] text-gray-400 hover:bg-white/[0.03]"
                 }`}
               >
@@ -194,41 +197,72 @@ export default function Page() {
           </div>
         </div>
         <section className="space-y-8 pb-20">
-          <div className="flex justify-between items-center border-b border-white/[0.05] pb-4">
-            <h2 className="text-xs uppercase tracking-[0.4em]">
-              {day} Schedule
+          <div className="border-b border-white/[0.05] pb-4">
+            <h2 className="text-xs uppercase tracking-[0.4em] text-purple-500">
+              {day} Хуваарь
             </h2>
           </div>
+
           {filteredSchedule.length === 0 ? (
             <p className="text-gray-600 text-lg">
-              No schedule found for {day}.
+              {day} өдөрт хуваарь олдсонгүй.
             </p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.05]">
-              {filteredSchedule.map((info) => {
-                const slots = generateSlots(
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.05]">
+              {filteredSchedule.flatMap((info) =>
+                generateSlots(
                   info.startTime,
                   info.endTime,
                   info.slotInterval ?? 60,
-                );
-                return slots.map((slot, index) => (
+                ).map((slot, index) => (
                   <div
-                    key={index}
-                    className="bg-[#0A0A0A] p-8 flex flex-col items-center justify-center group hover:bg-white/[0.02] transition-colors"
+                    key={`${info.id}-${index}`}
+                    onClick={() => {
+                      const endTime = addMinutesToTime(
+                        slot,
+                        info.slotInterval ?? 60,
+                      );
+
+                      setSelectedStartTime(slot);
+                      setSelectedEndTime(endTime);
+                      setOpenDialog(true);
+                    }}
+                    className="bg-[#0A0A0A] p-8 flex flex-col items-center justify-center hover:bg-white/[0.02] cursor-pointer"
                   >
-                    <span className="text-[10px] font-bold text-gray-700 uppercase tracking-[0.2em] mb-3 group-hover:text-emerald-500 transition-colors">
-                      Time Slot
-                    </span>
-                    <span className="text-3xl font-light text-white font-mono tracking-tighter">
+                    <span className="text-3xl font-light font-mono">
                       {slot}
                     </span>
                   </div>
-                ));
-              })}
+                )),
+              )}
             </div>
           )}
         </section>
       </div>
+      {openDialog && selectedStartTime && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-[#0A0A0A] border border-white/[0.1] p-8 rounded-xl min-w-[320px]">
+            <h3 className="text-xl mb-4">Selected Time</h3>
+
+            <p className="text-purple-400 text-3xl font-mono mb-2">
+              {selectedStartTime} → {selectedEndTime}
+            </p>
+            <button
+              onClick={sendOrder}
+              className="mt-6 px-4 py-2 bg-purple-500 text-black rounded-lg w-full hover:bg-purple-400 transition"
+            >
+              Book Time
+            </button>
+
+            <button
+              onClick={() => setOpenDialog(false)}
+              className="mt-3 px-4 py-2 border border-white/20 rounded-lg w-full"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

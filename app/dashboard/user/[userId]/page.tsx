@@ -1,9 +1,18 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
-import { LayoutDashboard, User, Settings, LogOut, Menu, X } from "lucide-react";
+import {
+  LayoutDashboard,
+  User,
+  Settings,
+  LogOut,
+  Globe,
+  Clock,
+  ArrowUpRight,
+  Sparkles,
+} from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Toaster } from "sonner";
 
 export type UserType = {
   id: string;
@@ -13,14 +22,15 @@ export type UserType = {
   clerkId: string;
   companyId: string;
 };
+
 export type CompanyType = {
-  closeTime: Date;
+  closeTime: string;
   createdAt: Date;
   feedback: string;
   id: string;
   location: string;
   name: string;
-  openTime: Date;
+  openTime: string;
   typeOfCompany: string;
   image: string;
 };
@@ -28,108 +38,134 @@ export type CompanyType = {
 const UserPanel = () => {
   const params = useParams();
   const userId = params.userId;
-  const [getUser, setGetUser] = useState<UserType[]>([]);
-  const [company, setCompany] = useState<CompanyType[]>([]);
   const { push } = useRouter();
 
-  const companyGet = async () => {
-    const response = await fetch("/api/company");
-    const res = await response.json();
-    setCompany(res);
-  };
+  const [getUser, setGetUser] = useState<UserType[]>([]);
+  const [company, setCompany] = useState<CompanyType[]>([]);
+  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const userGet = async () => {
-      const response = await fetch(`/api/user/${userId}`);
-      const res = await response.json();
-      setGetUser(res);
-    };
-    userGet();
-    companyGet();
-  }, []);
-  console.log(company.map((a) => a.id));
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [userRes, companyRes] = await Promise.all([
+          fetch(`/api/user/${userId}`),
+          fetch("/api/company"),
+        ]);
 
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+        const userData = await userRes.json();
+        const companyData = await companyRes.json();
+
+        setGetUser(Array.isArray(userData) ? userData : [userData]);
+        setCompany(companyData);
+      } catch (error) {
+        console.error("Data fetch failed", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (userId) fetchData();
+  }, [userId]);
 
   return (
-    <div className="flex h-screen bg-zinc-950 text-zinc-100 font-sans">
-      {/* Sidebar */}
-      <aside
-        className={`${
-          isSidebarOpen ? "w-64" : "w-20"
-        } bg-zinc-900 border-r border-zinc-800 transition-all duration-300 flex flex-col`}
-      >
-        <div className="p-6 flex items-center justify-between">
-          {isSidebarOpen && (
-            <h1 className="text-xl font-bold text-purple-500 tracking-tight">
-              CHRONOS
-            </h1>
-          )}
-        </div>
+    <div className="flex h-screen bg-[#020203] text-gray-100 font-sans selection:bg-fuchsia-500/30 overflow-hidden">
+      <Toaster theme="dark" position="top-center" />
+      <main className="flex-1 flex flex-col relative overflow-hidden">
+        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-fuchsia-600/5 blur-[120px] rounded-full pointer-events-none" />
+        <nav className="fixed top-0 w-full z-50 border-b border-white/[0.05] bg-black/60 backdrop-blur-2xl px-6 sm:px-12 lg:px-24 py-6 flex items-center justify-between relative">
+          <div
+            className="flex items-center gap-4 group cursor-pointer"
+            onClick={() => push("/")}
+          >
+            <div className="w-10 h-10 bg-gradient-to-tr from-fuchsia-600 to-purple-600 text-white rounded-full flex items-center justify-center transition-transform duration-500 group-hover:rotate-180 shadow-[0_0_20px_rgba(192,38,211,0.3)]">
+              <Clock size={16} strokeWidth={3} />
+            </div>
 
-        <nav className="flex flex-col gap-2">
-          <div onClick={() => push(`/dashboard/user/${userId}`)}>
-            <NavItem
-              icon={<LayoutDashboard size={20} />}
-              label="Dashboard"
-              active
-            />
+            <span className="text-[20px] font-bold uppercase tracking-[0.5em] text-white">
+              Chronos
+            </span>
           </div>
-          <div onClick={() => push(`/dashboard/user/${userId}/profile`)}>
-            <NavItem icon={<User size={20} />} label="Profile" />
-          </div>
+          <div className="hidden md:flex items-center gap-12">
+            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500 hover:text-fuchsia-500 transition-colors"></div>
 
-          <div onClick={() => push(`/dashboard/user/${userId}/settings`)}>
-            <NavItem icon={<Settings size={20} />} label="Settings" />
+            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500 hover:text-fuchsia-500 transition-colors"></div>
           </div>
+          <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-fuchsia-500/40 to-transparent animate-pulse" />
+          <button
+            className="px-6 py-3 bg-white text-black text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-fuchsia-500 hover:text-white transition-all active:scale-[0.98]"
+            onClick={() => push("/createCompany")}
+          >
+            БАЙГУУЛЛАГА YYСГЭХ
+          </button>
         </nav>
-      </aside>
-
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <section className="p-8 overflow-y-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Example Card */}
-            {company.map((a, index) => (
-              <div key={index}>
-                <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30 h-70">
-                  <CardContent className="text-white ">
-                    {a.image ? (
-                      <img
-                        className="w-40 h-40 sm:h-48 object-cover object-center"
-                        src={a.image}
-                      />
-                    ) : (
-                      "no image"
-                    )}
-                    <div className="flex text-white justify-start">
-                      <div className="ml-3 mt-2">{a?.name}</div>
-                    </div>
-                    <p className="text-white mt-4">Хаяг: {a?.location}</p>
-                    <div>
-                      Цагийн хуваарь:
-                      <span className="text-xs font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded">
-                        WORKING HOURS GO HERE
-                      </span>
-                    </div>
-                    <Button
-                      className="w-full mt-2"
-                      onClick={() => {
-                        push(`/company/companyDetails/${a.id}`);
-                      }}
+        <section className="flex-1 overflow-y-auto p-8 relative z-10">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.05]">
+              {isLoading
+                ? Array.from({ length: 6 }).map((_, i) => (
+                    <SkeletonCard key={i} />
+                  ))
+                : company.map((a, index) => (
+                    <div
+                      key={index}
+                      className="group relative bg-[#0A0A0A] hover:bg-white/[0.02] transition-all duration-500 p-8 flex flex-col"
                     >
-                      Компани руу очих
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            ))}
-          </div>
+                      <div className="absolute top-0 left-0 w-full h-px bg-fuchsia-500/0 group-hover:bg-fuchsia-500/50 transition-all duration-700" />
 
-          <div className="mt-8 p-8 rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-950 border border-zinc-800 h-64 flex items-center justify-center">
-            <p className="text-zinc-500 italic">
-              Content Area: Your charts or data tables go here.
-            </p>
+                      <div className="relative aspect-video w-full overflow-hidden rounded-sm mb-6 border border-white/[0.05]">
+                        {a.image ? (
+                          <img
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            src={a.image}
+                            alt={a.name}
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-[10px] font-bold text-gray-700 uppercase tracking-widest">
+                            No Media
+                          </div>
+                        )}
+                        <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-md border border-white/10 rounded-xs">
+                          <span className="text-[8px] font-bold text-fuchsia-400 uppercase tracking-widest">
+                            {a.typeOfCompany || "Service"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 mb-8">
+                        <h3 className="text-2xl font-bold tracking-tighter text-white uppercase italic group-hover:text-fuchsia-400 transition-colors">
+                          {a.name}
+                        </h3>
+                        <div className="space-y-2">
+                          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                            <span className="w-1 h-1 bg-fuchsia-500 rounded-full" />
+                            {a.location}
+                          </p>
+                          <p className="text-[9px] font-mono text-gray-600 bg-white/[0.03] px-2 py-1 inline-block border border-white/[0.05]">
+                            Working Hours Configured
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => push(`/company/companyDetails/${a.id}`)}
+                        className="mt-auto w-full py-4 bg-white text-black text-[10px] font-black uppercase tracking-[0.3em] transition-all hover:bg-fuchsia-600 hover:text-white active:scale-[0.98] flex items-center justify-center gap-2"
+                      >
+                        Компани руу очих
+                        <ArrowUpRight size={14} />
+                      </button>
+                    </div>
+                  ))}
+            </div>
+
+            <div className="mt-12 p-12 border border-dashed border-white/10 bg-white/[0.01] flex flex-col items-center justify-center text-center space-y-4">
+              <div className="w-12 h-12 rounded-full bg-white/[0.02] border border-white/10 flex items-center justify-center text-gray-600">
+                <Sparkles size={20} />
+              </div>
+              <p className="text-[10px] font-bold text-gray-600 uppercase tracking-[0.4em]">
+                System Status: Synchronized • ©2026 Chronos
+              </p>
+            </div>
           </div>
         </section>
       </main>
@@ -137,29 +173,51 @@ const UserPanel = () => {
   );
 };
 
-export default UserPanel;
 function NavItem({
   icon,
   label,
   active = false,
+  isOpen = true,
 }: {
   icon: React.ReactNode;
   label: string;
   active?: boolean;
+  isOpen?: boolean;
 }) {
   return (
     <div
       className={`
-      flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200
+      flex items-center ${isOpen ? "gap-4 px-4" : "justify-center"} py-4 rounded-sm cursor-pointer transition-all duration-300 group
       ${
         active
-          ? "bg-purple-600/20 text-purple-400 border border-purple-500/30 shadow-[inset_0_0_10px_rgba(168,85,247,0.1)]"
-          : "text-slate-500 hover:text-purple-300 hover:bg-purple-900/10"
+          ? "text-fuchsia-500 bg-fuchsia-500/[0.03] border-l-2 border-fuchsia-500"
+          : "text-gray-500 hover:text-white hover:bg-white/[0.02] border-l-2 border-transparent"
       }
     `}
     >
-      {icon}
-      <span className="font-medium">{label}</span>
+      <div
+        className={`${active ? "text-fuchsia-500" : "group-hover:text-fuchsia-400"} transition-colors`}
+      >
+        {icon}
+      </div>
+      {isOpen && (
+        <span className="text-[11px] font-bold uppercase tracking-[0.2em]">
+          {label}
+        </span>
+      )}
     </div>
   );
 }
+
+const SkeletonCard = () => (
+  <div className="bg-[#0A0A0A] p-8 animate-pulse space-y-6">
+    <div className="aspect-video w-full bg-white/5 rounded-sm" />
+    <div className="space-y-3">
+      <div className="h-6 w-3/4 bg-white/5 rounded" />
+      <div className="h-3 w-1/2 bg-white/5 rounded" />
+    </div>
+    <div className="h-12 w-full bg-white/5 rounded" />
+  </div>
+);
+
+export default UserPanel;

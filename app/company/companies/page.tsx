@@ -99,7 +99,7 @@ const CompaniesPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {companies.map((com) => (
               <div
-                onClick={() => push(`/dashboard/worker/createWorker/${com.id}`)}
+                onClick={() => push(`/company/companyDetails/${com.id}`)}
                 key={com.id}
                 className="group relative cursor-pointer p-8 rounded-[2.5rem] border border-white/5 bg-zinc-950/30 hover:bg-white/[0.02] hover:border-fuchsia-500/30 transition-all duration-500 overflow-hidden"
               >

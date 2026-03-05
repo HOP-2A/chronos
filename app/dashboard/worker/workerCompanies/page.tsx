@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Clock, MapPin, Building2, Sparkles, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ChronosHeaderBar from "@/app/_component/ChronosHeaderBar";
 
 type companyType = {
   closeTime: string;
@@ -39,125 +40,115 @@ const CompaniesPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#020203] text-zinc-100 selection:bg-fuchsia-500/30 overflow-x-hidden">
-      <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl z-50 rounded-full border border-white/10 bg-black/40 backdrop-blur-2xl px-6 py-3 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-        <div
-          onClick={() => push("/")}
-          className="flex items-center gap-2 group cursor-pointer"
-        >
-          <div className="w-7 h-7 bg-fuchsia-600 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(192,38,211,0.5)] group-hover:rotate-90 transition-transform duration-500">
-            <Clock size={14} className="text-white" />
-          </div>
-          <span className="font-bold tracking-tighter text-lg uppercase italic">
-            Chronos
-          </span>
-        </div>
-        <div className="hidden md:flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-          <div
-            onClick={() => push("/dashboard/worker/workerCompanies")}
-            className="hover:text-fuchsia-400 transition-colors cursor-pointer"
-          >
-            компаниуд
-          </div>
-          <a href="#" className="hover:text-fuchsia-400 transition-colors">
-            бидний тухай
-          </a>
-        </div>
-        <Button
-          onClick={() => push("/createCompany")}
-          className="rounded-full bg-fuchsia-500 text-white hover:bg-indigo-400 px-6 h-9 text-xs font-bold transition-all duration-300"
-        >
-          КОМПАНИ ҮҮСГЭХ
-        </Button>
-      </nav>
+    <div className="min-h-screen bg-[#020203] text-gray-100 font-sans selection:bg-fuchsia-500/30 overflow-x-hidden">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-fuchsia-600/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-purple-600/10 blur-[100px] rounded-full" />
+      </div>
+      <ChronosHeaderBar />
 
-      <header className="relative pt-48 pb-16 px-6 text-center">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] bg-fuchsia-600/5 blur-[120px] rounded-full pointer-events-none" />
-
-        <div className="max-w-4xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/5 bg-white/5 text-zinc-400 text-[10px] font-bold uppercase tracking-[0.2em]">
-            <Sparkles size={12} className="text-fuchsia-500" /> Сүлжээнд нэгдсэн
+      <header className="relative pt-48 pb-20 px-6 sm:px-12 lg:px-24">
+        <div className="max-w-7xl mx-auto w-full space-y-8">
+          <div className="inline-flex items-center gap-3">
+            <Sparkles size={14} className="text-fuchsia-500" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-fuchsia-500">
+              Нэгдсэн Сүлжээ
+            </span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-serif italic leading-tight tracking-tight text-white">
-            Манай Компаниуд
+          <h1 className="text-6xl sm:text-8xl lg:text-[8rem] font-black tracking-tighter leading-[0.82] text-white italic">
+            МАНАЙ <br />
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-500 via-purple-400 to-indigo-500">
+              КОМПАНИУД
+            </span>
           </h1>
-          <p className="text-zinc-500 text-base max-w-lg mx-auto font-medium">
-            Хамгийн шилдэг үйлчилгээ үзүүлэгч нарыг нэг дороос олж, цаг
-            захиалгаа баталгаажуул.
-          </p>
+          <div className="max-w-xl border-l border-fuchsia-500/30 pl-8 py-2">
+            <p className="text-lg text-gray-400 font-light leading-relaxed">
+              Шилдэг үйлчилгээ үзүүлэгчдийг нэг дороос олж,{" "}
+              <span className="text-fuchsia-400 font-medium">
+                Chronos дэд бүтцийн
+              </span>{" "}
+              тусламжтайгаар цагаа баталгаажуул.
+            </p>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 pb-32">
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <CompanySkeleton key={i} />
-            ))}
-          </div>
-        ) : companies.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {companies.map((com) => (
-              <div
-                onClick={() => push(`/dashboard/worker/createWorker/${com.id}`)}
-                key={com.id}
-                className="group relative cursor-pointer p-8 rounded-[2.5rem] border border-white/5 bg-zinc-950/30 hover:bg-white/[0.02] hover:border-fuchsia-500/30 transition-all duration-500 overflow-hidden"
-              >
-                {/* ... your existing company card content ... */}
-                <div className="absolute -right-10 -top-10 w-32 h-32 bg-fuchsia-600/5 blur-3xl group-hover:bg-fuchsia-600/10 transition-all" />
-                <div className="flex justify-between items-start mb-8">
-                  <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                    <Building2 className="text-fuchsia-500" size={28} />
+      <main className="px-6 sm:px-12 lg:px-24 pb-32">
+        <div className="max-w-7xl mx-auto">
+          <header className="flex justify-between items-end border-b border-white/[0.05] pb-8 mb-12">
+            <h2 className="text-xs font-bold uppercase tracking-[0.5em] text-white">
+              Идэвхтэй байгууллагууд
+            </h2>
+            <span className="text-[10px] font-mono text-fuchsia-500 uppercase tracking-widest">
+              {isLoading ? "LOADING" : `${companies.length} БYРТГЭГДСЭН`}
+            </span>
+          </header>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.05]">
+            {isLoading
+              ? Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="bg-[#020203] p-px">
+                    <CompanySkeleton />
                   </div>
-                </div>
-                <div className="mb-8">
-                  <p className="text-[10px] font-black text-fuchsia-500 uppercase tracking-[0.2em] mb-1">
-                    {com.typeOfCompany}
-                  </p>
-                  <h2 className="text-2xl font-bold uppercase italic leading-tight tracking-tight text-white group-hover:text-fuchsia-500 transition-colors">
-                    {com.name}
-                  </h2>
-                </div>
-                <div className="space-y-5 mb-10">
-                  <div className="flex items-center gap-3 text-zinc-400">
-                    <MapPin size={16} className="text-zinc-600" />
-                    <span className="text-xs font-medium uppercase tracking-wider">
-                      {com.location}
-                    </span>
+                ))
+              : companies.map((com) => (
+                  <div
+                    key={com.id}
+                    onClick={() =>
+                      push(`/dashboard/worker/createWorker/${com.id}`)
+                    }
+                    className="p-10 group transition-all relative overflow-hidden bg-[#020203] hover:bg-white/[0.02] cursor-pointer"
+                  >
+                    <div className="absolute top-0 left-0 w-full h-px transition-all duration-700 bg-fuchsia-500/0 group-hover:bg-fuchsia-500/50" />
+
+                    <div className="flex justify-between items-start mb-12">
+                      <div className="w-14 h-14 rounded-full border border-white/10 bg-gradient-to-br from-zinc-800 to-black flex items-center justify-center transition-transform duration-500 group-hover:scale-110">
+                        <Building2 size={24} className="text-fuchsia-500" />
+                      </div>
+                      <div className="p-2 bg-white/5 rounded-full text-white/20 group-hover:text-fuchsia-500 group-hover:rotate-45 transition-all">
+                        <ArrowUpRight size={18} />
+                      </div>
+                    </div>
+
+                    <div className="mb-12">
+                      <p className="text-[9px] text-fuchsia-500 font-bold uppercase tracking-[0.3em] mb-2">
+                        {com.typeOfCompany}
+                      </p>
+                      <h4 className="text-3xl font-bold tracking-tighter text-white uppercase group-hover:text-fuchsia-400 transition-colors italic">
+                        {com.name}
+                      </h4>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <MapPin size={14} className="text-gray-600" />
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
+                          {com.location}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Clock size={14} className="text-gray-600" />
+                        <span className="text-[10px] font-mono text-gray-400">
+                          {com.openTime} — {com.closeTime}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3 text-zinc-400">
-                    <Clock size={16} className="text-zinc-600" />
-                    <span className="text-xs font-medium uppercase tracking-wider">
-                      {com.openTime} — {com.closeTime}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+                ))}
           </div>
-        ) : (
-          /* Empty State Section */
-          <div className="flex flex-col items-center justify-center py-24 border border-dashed border-white/10 rounded-[3rem] bg-white/[0.01]">
-            <div className="w-16 h-16 rounded-full bg-zinc-900 flex items-center justify-center mb-6 border border-white/5">
-              <Building2 className="text-zinc-700" size={32} />
-            </div>
-            <h3 className="text-xl font-bold text-white uppercase italic tracking-wider mb-2">
-              Одоогоор компани байхгүй байна
-            </h3>
-            <p className="text-zinc-500 text-sm mb-8 text-center max-w-xs">
-              Та анхны компанийг бүртгүүлж, үйлчилгээгээ идэвхжүүлнэ үү.
-            </p>
-          </div>
-        )}
+        </div>
       </main>
 
-      <footer className="py-12 px-6 border-t border-white/5">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="text-xs font-bold text-zinc-600 uppercase tracking-[0.3em]">
-            ©2026 Chronos XXK
+      <footer className="px-6 sm:px-12 lg:px-24 py-16 border-t border-white/[0.05] bg-black">
+        <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row justify-between items-center gap-8 text-gray-600">
+          <div className="text-[9px] font-bold uppercase tracking-[0.5em]">
+            ©2026 CHRONOS • ТӨСӨЛ
           </div>
-          <div className="flex items-center gap-2 text-zinc-400 text-[10px] font-bold uppercase tracking-widest">
-            <Globe size={12} className="text-fuchsia-500" /> pinecone academy
+          <div className="flex items-center gap-3">
+            <Globe size={12} className="text-fuchsia-500" />
+            <span className="text-[9px] font-bold uppercase tracking-[0.3em]">
+              PINECONE ACADEMY
+            </span>
           </div>
         </div>
       </footer>

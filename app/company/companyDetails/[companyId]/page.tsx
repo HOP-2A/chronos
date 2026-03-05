@@ -74,7 +74,7 @@ export default function Page() {
       <div className="flex-1 px-6 py-10 sm:px-12 lg:px-24 max-w-7xl mx-auto w-full space-y-24">
         <header>
           <div className="mb-4">
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-purple-500 bg-emerald-500/10 px-3 py-1 rounded-full border border-3purple-500/20">
               {companyInfo?.typeOfCompany}
             </span>
           </div>
@@ -152,7 +152,7 @@ export default function Page() {
                   push(`/dashboard/worker/workerOrder/${worker.id}`)
                 }
               >
-                <p className="text-sm font-medium text-white mb-1 group-hover:text-emerald-400 transition-colors">
+                <p className="text-sm font-medium text-white mb-1 group-hover:text-purple-600 transition-colors">
                   {worker.name}
                 </p>
                 <p className="text-xs text-gray-500 font-mono tracking-tighter">

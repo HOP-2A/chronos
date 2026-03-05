@@ -10,6 +10,7 @@ export const GET = async (
   try {
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
+      include: { appointments: true },  
     });
 
     if (!user) {
@@ -23,7 +24,7 @@ export const GET = async (
 
 export const DELETE = async (
   req: NextRequest,
-  context: { params: Promise<{ userId: string }> }
+  context: { params: Promise<{ userId: string }> },
 ) => {
   const { userId } = await context.params;
 
@@ -36,15 +37,13 @@ export const DELETE = async (
   }
 
   try {
-    // 1️⃣ Delete DB data first
     await prisma.$transaction([
       prisma.appointment.deleteMany({ where: { userId } }),
       prisma.user.delete({ where: { id: userId } }),
     ]);
 
-    // 2️⃣ Delete from Clerk
     if (user.clerkId) {
-      const client = await clerkClient(); // ✅ IMPORTANT
+      const client = await clerkClient();
       await client.users.deleteUser(user.clerkId);
     }
 

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { LayoutDashboard, User, Settings, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, User } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -77,10 +77,6 @@ const UserPanel = () => {
           </div>
           <div onClick={() => push(`/dashboard/user/${userId}/profile`)}>
             <NavItem icon={<User size={20} />} label="Profile" />
-          </div>
-
-          <div onClick={() => push(`/dashboard/user/${userId}/settings`)}>
-            <NavItem icon={<Settings size={20} />} label="Settings" />
           </div>
         </nav>
       </aside>

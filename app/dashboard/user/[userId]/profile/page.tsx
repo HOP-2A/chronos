@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, User, Settings, Loader2 } from "lucide-react";
+import { LayoutDashboard, User, Loader2 } from "lucide-react";
 import { UserType } from "../page";
 
 const Page = () => {
@@ -28,12 +28,13 @@ const Page = () => {
       setLoading(false);
     }
   };
-
+  console.log(user);
   const deleteUser = async () => {
     await fetch(`/api/user/${userId}`, {
       method: "DELETE",
     });
   };
+
   const editOneUser = async () => {
     await fetch(`/api/user/${userId}`, {
       method: "PATCH",

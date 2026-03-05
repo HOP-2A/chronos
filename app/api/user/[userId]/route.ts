@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async (
@@ -9,6 +10,7 @@ export const GET = async (
   try {
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
+      include: { appointments: true },  
     });
 
     if (!user) {
@@ -26,10 +28,6 @@ export const DELETE = async (
 ) => {
   const { userId } = await context.params;
 
-  if (!userId) {
-    return NextResponse.json({ error: "no user id" }, { status: 400 });
-  }
-
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
@@ -38,15 +36,22 @@ export const DELETE = async (
     return NextResponse.json({ error: "user not found" }, { status: 404 });
   }
 
-  await prisma.appointment.deleteMany({
-    where: { userId },
-  });
+  try {
+    await prisma.$transaction([
+      prisma.appointment.deleteMany({ where: { userId } }),
+      prisma.user.delete({ where: { id: userId } }),
+    ]);
 
-  await prisma.user.delete({
-    where: { id: userId },
-  });
+    if (user.clerkId) {
+      const client = await clerkClient();
+      await client.users.deleteUser(user.clerkId);
+    }
 
-  return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "delete failed" }, { status: 500 });
+  }
 };
 
 export const PATCH = async (

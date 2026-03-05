@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { LayoutDashboard, User, Settings, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, User, MapPin, Building } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ export type UserType = {
   clerkId: string;
   companyId: string;
 };
+
 export type CompanyType = {
   closeTime: Date;
   createdAt: Date;
@@ -28,9 +29,11 @@ export type CompanyType = {
 const UserPanel = () => {
   const params = useParams();
   const userId = params.userId;
+  const { push } = useRouter();
+
   const [getUser, setGetUser] = useState<UserType[]>([]);
   const [company, setCompany] = useState<CompanyType[]>([]);
-  const { push } = useRouter();
+  const [isSidebarOpen, setSidebarOpen] = useState(true);
 
   const companyGet = async () => {
     const response = await fetch("/api/company");
@@ -44,20 +47,19 @@ const UserPanel = () => {
       const res = await response.json();
       setGetUser(res);
     };
+
     userGet();
     companyGet();
   }, []);
-  console.log(company.map((a) => a.id));
-
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className="flex h-screen bg-zinc-950 text-zinc-100 font-sans">
-      {/* Sidebar */}
+    <div className="flex h-screen bg-black text-zinc-300 font-sans">
+      {/* SIDEBAR */}
+
       <aside
         className={`${
           isSidebarOpen ? "w-64" : "w-20"
-        } bg-zinc-900 border-r border-zinc-800 transition-all duration-300 flex flex-col`}
+        } bg-zinc-950 border-r border-zinc-800 transition-all duration-300 flex flex-col`}
       >
         <div className="p-6 flex items-center justify-between">
           {isSidebarOpen && (
@@ -67,7 +69,7 @@ const UserPanel = () => {
           )}
         </div>
 
-        <nav className="flex flex-col gap-2">
+        <nav className="flex flex-col gap-2 px-3">
           <div onClick={() => push(`/dashboard/user/${userId}`)}>
             <NavItem
               icon={<LayoutDashboard size={20} />}
@@ -75,60 +77,89 @@ const UserPanel = () => {
               active
             />
           </div>
+
           <div onClick={() => push(`/dashboard/user/${userId}/profile`)}>
             <NavItem icon={<User size={20} />} label="Profile" />
-          </div>
-
-          <div onClick={() => push(`/dashboard/user/${userId}/settings`)}>
-            <NavItem icon={<Settings size={20} />} label="Settings" />
           </div>
         </nav>
       </aside>
 
-      {/* Main Content Area */}
+      {/* MAIN */}
+
       <main className="flex-1 flex flex-col overflow-hidden">
-        <section className="p-8 overflow-y-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Example Card */}
+        {/* TOP HEADER */}
+
+        <div className="w-full h-52 bg-gradient-to-b from-zinc-900 to-black border-b border-zinc-800 flex items-end">
+          <div className="px-10 pb-8">
+            <h2 className="text-2xl text-zinc-400 font-light">
+              Explore{" "}
+              <span className="text-purple-400 font-semibold">Companies</span>
+            </h2>
+          </div>
+        </div>
+
+        {/* CONTENT */}
+
+        <section className="p-8 overflow-y-auto -mt-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {company.map((a, index) => (
-              <div key={index}>
-                <Card className="bg-gradient-to-br from-purple-950/20 to-black border-purple-900/30 h-70">
-                  <CardContent className="text-white ">
+              <Card
+                key={index}
+                className="bg-zinc-950 border-zinc-800 hover:border-purple-600 transition-all duration-300 hover:shadow-xl hover:shadow-purple-900/20 group"
+              >
+                <CardContent className="p-0">
+                  {/* IMAGE */}
+
+                  <div className="h-48 overflow-hidden rounded-t-xl">
                     {a.image ? (
                       <img
-                        className="w-40 h-40 sm:h-48 object-cover object-center"
                         src={a.image}
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                       />
                     ) : (
-                      "no image"
+                      <div className="w-full h-full flex items-center justify-center text-zinc-500">
+                        no image
+                      </div>
                     )}
-                    <div className="flex text-white justify-start">
-                      <div className="ml-3 mt-2">{a?.name}</div>
+                  </div>
+
+                  {/* INFO */}
+
+                  <div className="p-5 space-y-3">
+                    <div className="flex items-center gap-2 text-white font-semibold">
+                      <Building className="w-4 h-4 text-purple-500" />
+                      {a.name}
                     </div>
-                    <p className="text-white mt-4">Хаяг: {a?.location}</p>
-                    <div>
+
+                    <div className="flex items-center gap-2 text-sm text-zinc-500">
+                      <MapPin className="w-4 h-4 text-purple-400" />
+                      {a.location}
+                    </div>
+
+                    <div className="text-sm text-zinc-400">
                       Цагийн хуваарь:
-                      <span className="text-xs font-mono text-purple-500 bg-purple-500/10 px-2 py-1 rounded">
+                      <span className="ml-2 text-xs font-mono text-purple-400 bg-purple-500/10 px-2 py-1 rounded">
                         WORKING HOURS GO HERE
                       </span>
                     </div>
+
                     <Button
-                      className="w-full mt-2"
-                      onClick={() => {
-                        push(`/company/companyDetails/${a.id}`);
-                      }}
+                      className="w-full mt-2 bg-purple-600 hover:bg-purple-700"
+                      onClick={() => push(`/company/companyDetails/${a.id}`)}
                     >
                       Компани руу очих
                     </Button>
-                  </CardContent>
-                </Card>
-              </div>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
 
-          <div className="mt-8 p-8 rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-950 border border-zinc-800 h-64 flex items-center justify-center">
+          {/* BOTTOM PLACEHOLDER */}
+
+          <div className="mt-10 p-10 rounded-2xl bg-zinc-950 border border-zinc-800 flex items-center justify-center">
             <p className="text-zinc-500 italic">
-              Content Area: Your charts or data tables go here.
+              Content Area: Charts or data analytics will go here.
             </p>
           </div>
         </section>
@@ -138,6 +169,7 @@ const UserPanel = () => {
 };
 
 export default UserPanel;
+
 function NavItem({
   icon,
   label,

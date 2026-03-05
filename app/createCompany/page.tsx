@@ -16,9 +16,10 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 
-import { TimePicker } from "../_component/TimePicker";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
+import { useUser } from "@clerk/nextjs";
 
 type CompanyInfo = {
   name: string;
@@ -37,6 +38,15 @@ type CompanyInfo = {
   }>;
 };
 
+const days = [
+  { full: "Monday", short: "MON", emoji: "🌅" },
+  { full: "Tuesday", short: "TUE", emoji: "✦" },
+  { full: "Wednesday", short: "WED", emoji: "◈" },
+  { full: "Thursday", short: "THU", emoji: "◇" },
+  { full: "Friday", short: "FRI", emoji: "✺" },
+  { full: "Saturday", short: "SAT", emoji: "◉" },
+  { full: "Sunday", short: "SUN", emoji: "☀" },
+];
 const BG_URL = "";
 
 export default function Page() {
@@ -55,8 +65,8 @@ export default function Page() {
   });
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const clerkId = useUser();
 
   const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -67,9 +77,6 @@ export default function Page() {
       return prev;
     });
   };
-  console.log(file);
-
-  // Inside your Page component...
 
   const createCompany = async () => {
     try {
@@ -81,6 +88,7 @@ export default function Page() {
         image: info.image,
         openTime: info.openTime,
         closeTime: info.closeTime,
+        adminId: clerkId.user?.id,
       };
 
       const res = await fetch("/api/company", {
@@ -153,7 +161,6 @@ export default function Page() {
     info.openTime !== "" &&
     info.closeTime !== "" &&
     !timesInvalid;
-
   return (
     <div className="relative min-h-screen overflow-hidden text-white bg-[#0f1014]">
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl z-50 rounded-full border border-white/10 bg-black/40 backdrop-blur-2xl px-6 py-3 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
@@ -314,13 +321,8 @@ export default function Page() {
                   />
                 </div>
               </div>
-
-              {timesInvalid && (
-                <p className="text-[11px] text-red-400 font-medium flex items-center gap-1">
-                  ⚠ Close time must be after open time
-                </p>
-              )}
             </div>
+
             <div className="pt-2">
               <Button
                 className="w-full h-12 bg-blue-600 text-white hover:bg-blue-500 active:scale-[0.98] transition-all rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-blue-600/30 disabled:opacity-30"

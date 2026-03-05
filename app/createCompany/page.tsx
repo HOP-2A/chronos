@@ -24,9 +24,10 @@ type CompanyInfo = {
   name: string;
   typeOfCompany: string;
   location: string;
-  openTime: Date | null;
-  closeTime: Date | null;
+  openTime: string;
+  closeTime: string;
   image: string;
+  adminId: string;
   workers: Array<{
     email: string;
     name: string;
@@ -44,10 +45,10 @@ export default function Page() {
     name: "",
     typeOfCompany: "",
     location: "",
-    openTime: null,
-    closeTime: null,
+    openTime: "",
+    closeTime: "",
     image: "",
-    adminID: "",
+    adminId: "",
     workers: [
       { email: "", name: "", phoneNumber: "", experience: [], feedback: [] },
     ],
@@ -78,8 +79,8 @@ export default function Page() {
         typeOfCompany: info.typeOfCompany,
         location: info.location,
         image: info.image,
-        openTime: info.openTime ? info.openTime.toISOString() : null,
-        closeTime: info.closeTime ? info.closeTime.toISOString() : null,
+        openTime: info.openTime,
+        closeTime: info.closeTime,
       };
 
       const res = await fetch("/api/company", {
@@ -143,14 +144,14 @@ export default function Page() {
   const baseDate = React.useMemo(() => new Date(), []);
 
   const timesInvalid =
-    !!info.openTime && !!info.closeTime && info.closeTime <= info.openTime;
+    info.openTime && info.closeTime && info.closeTime <= info.openTime;
 
   const canSubmit =
     info.name.trim() &&
     info.typeOfCompany.trim() &&
     info.location.trim() &&
-    info.openTime &&
-    info.closeTime &&
+    info.openTime !== "" &&
+    info.closeTime !== "" &&
     !timesInvalid;
 
   return (
@@ -282,26 +283,34 @@ export default function Page() {
               </div>
 
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div className="space-y-1">
-                  <TimePicker
-                    label="Opening At"
+                <div className="space-y-2 group">
+                  <label className="text-[11px] font-black uppercase tracking-widest text-gray-500">
+                    Opening At (24h)
+                  </label>
+                  <Input
+                    type="time"
+                    name="openTime"
+                    step="60"
                     value={info.openTime}
-                    onChange={(d) => setInfo((p) => ({ ...p, openTime: d }))}
-                    stepMinutes={15}
-                    baseDate={baseDate}
-                    use12h={false}
-                    className="bg-transparent"
+                    onChange={(e) =>
+                      setInfo((p) => ({ ...p, openTime: e.target.value }))
+                    }
+                    className="h-12 border-white/5 bg-white/5 text-white focus:bg-white/10 focus:ring-1 focus:ring-blue-500/50 transition-all rounded-xl [color-scheme:dark] appearance-none"
                   />
                 </div>
-                <div className="space-y-1">
-                  <TimePicker
-                    label="Closing At"
+                <div className="space-y-2 group">
+                  <label className="text-[11px] font-black uppercase tracking-widest text-gray-500">
+                    Closing At (24h)
+                  </label>
+                  <Input
+                    type="time"
+                    name="closeTime"
+                    step="60"
                     value={info.closeTime}
-                    onChange={(d) => setInfo((p) => ({ ...p, closeTime: d }))}
-                    stepMinutes={15}
-                    baseDate={baseDate}
-                    use12h={false}
-                    className="bg-transparent"
+                    onChange={(e) =>
+                      setInfo((p) => ({ ...p, closeTime: e.target.value }))
+                    }
+                    className="h-12 border-white/5 bg-white/5 text-white focus:bg-white/10 focus:ring-1 focus:ring-blue-500/50 transition-all rounded-xl [color-scheme:dark] appearance-none"
                   />
                 </div>
               </div>

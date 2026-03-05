@@ -134,7 +134,6 @@ export default function AdminDashboard() {
         <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full" />
       </div>
 
-      {/* Header */}
       <header className="relative h-[35vh] border-b border-white/5 overflow-hidden">
         {companyInfo?.image ? (
           <img

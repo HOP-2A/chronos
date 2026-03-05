@@ -19,7 +19,7 @@ export default function ChronosPrestige() {
         </div>
         <div className="hidden md:flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400">
           <div
-            onClick={() => push("/dashboard/worker/workerCompanies")}
+            onClick={() => push("/company/companies/")}
             className="hover:text-fuchsia-400 transition-colors cursor-pointer"
           >
             компаниуд

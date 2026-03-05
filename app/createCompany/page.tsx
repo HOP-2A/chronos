@@ -4,7 +4,15 @@ import * as React from "react";
 import { ChangeEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Building2, MapPin, Briefcase, Clock, PlusCircle } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  Building2,
+  MapPin,
+  Briefcase,
+  Clock,
+  PlusCircle,
+  ChevronDownIcon,
+} from "lucide-react";
 
 import { upload } from "@vercel/blob/client";
 
@@ -37,6 +45,16 @@ type CompanyInfo = {
   }>;
 };
 
+
+const days = [
+  { full: "Monday", short: "MON", emoji: "🌅" },
+  { full: "Tuesday", short: "TUE", emoji: "✦" },
+  { full: "Wednesday", short: "WED", emoji: "◈" },
+  { full: "Thursday", short: "THU", emoji: "◇" },
+  { full: "Friday", short: "FRI", emoji: "✺" },
+  { full: "Saturday", short: "SAT", emoji: "◉" },
+  { full: "Sunday", short: "SUN", emoji: "☀" },
+];
 const BG_URL = "";
 
 export default function Page() {
@@ -55,8 +73,9 @@ export default function Page() {
   });
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-
+ const [date, setDate] = React.useState<Date>();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState("x ");
 
   const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -67,7 +86,7 @@ export default function Page() {
       return prev;
     });
   };
-  console.log(file);
+
 
   // Inside your Page component...
 
@@ -313,14 +332,20 @@ export default function Page() {
                     className="h-12 border-white/5 bg-white/5 text-white focus:bg-white/10 focus:ring-1 focus:ring-blue-500/50 transition-all rounded-xl [color-scheme:dark] appearance-none"
                   />
                 </div>
+                              <div className="space-y-2 group">
+                <label className="text-[11px] font-black uppercase tracking-widest text-gray-500 group-focus-within:text-blue-400 transition-colors flex items-center gap-2">
+                  <MapPin className="w-3 h-3" /> Location
+                </label>
+                <Input
+                  name="location"
+                  value={info.location}
+                  onChange={handleInputValue}
+                  placeholder="e.g. Sukhbaatar District, UB"
+                  className="h-12 border-white/5 bg-white/5 text-white placeholder:text-gray-600 focus:bg-white/10 focus:ring-1 focus:ring-blue-500/50 transition-all rounded-xl"
+                />
+              </div>
               </div>
 
-              {timesInvalid && (
-                <p className="text-[11px] text-red-400 font-medium flex items-center gap-1">
-                  ⚠ Close time must be after open time
-                </p>
-              )}
-            </div>
             <div className="pt-2">
               <Button
                 className="w-full h-12 bg-blue-600 text-white hover:bg-blue-500 active:scale-[0.98] transition-all rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-blue-600/30 disabled:opacity-30"

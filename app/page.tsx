@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 export default function ChronosPrestige() {
   const { push } = useRouter();
+  const pushCreateCom = useRouter(`/app/com`);
   return (
     <div className="min-h-screen bg-[#020203] text-zinc-100 selection:bg-fuchsia-500/30 overflow-x-hidden">
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl z-50 rounded-full border border-white/10 bg-black/40 backdrop-blur-2xl px-6 py-3 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)]">

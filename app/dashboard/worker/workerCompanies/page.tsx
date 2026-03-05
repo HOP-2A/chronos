@@ -2,15 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import {
-  Clock,
-  MapPin,
-  ArrowUpRight,
-  Building2,
-  Sparkles,
-  Globe,
-  ChevronRight,
-} from "lucide-react";
+import { Clock, MapPin, Building2, Sparkles, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ChronosHeaderBar from "@/app/_component/ChronosHeaderBar";
 

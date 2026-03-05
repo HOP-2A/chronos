@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import {
-  Check,
-  X,
   Users,
   Clock,
   MapPin,
@@ -54,9 +52,7 @@ export default function AdminDashboard() {
       const [infoRes, workersRes, appsRes] = await Promise.all([
         fetch(`/api/company/getCompanyInfo/${companyId}`),
         fetch(`/api/worker/getWorkersByCompanyId/${companyId}`),
-        fetch(
-          `/api/company/applications?companyId=${companyId}&status=PENDING`,
-        ),
+        fetch(`/api/company/${companyId}/applications?status=PENDING`),
       ]);
 
       const info = await infoRes.json();
@@ -89,7 +85,7 @@ export default function AdminDashboard() {
     setIsProcessing(applicationId);
     try {
       const response = await fetch(
-        `/api/company/applications/${applicationId}/decide`,
+        `/api/company/${companyId}/applications/${applicationId}/decide`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -138,7 +134,6 @@ export default function AdminDashboard() {
         <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full" />
       </div>
 
-      {/* Header */}
       <header className="relative h-[35vh] border-b border-white/5 overflow-hidden">
         {companyInfo?.image ? (
           <img

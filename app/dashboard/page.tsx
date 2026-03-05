@@ -3,7 +3,8 @@
 import { SignUpButton, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { chronosClerkAppearance } from "../_component/ChronosClerk";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { ArrowLeft } from "lucide-react";
 
 export type UserType = {
   id: string;
@@ -35,12 +36,19 @@ const Page = () => {
     };
 
     checkUserRole();
-  }, [isLoaded, isSignedIn, push]);
+  }, [isLoaded, isSignedIn, push, user?.id]);
+
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[#020203] text-gray-100 font-sans selection:bg-fuchsia-500/30">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-fuchsia-600/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-purple-600/10 blur-[100px] rounded-full" />
+    <div className="min-h-screen relative overflow-hidden bg-black text-white">
+      <button
+        onClick={() => push("/")}
+        className="fixed top-8 left-8 z-50 flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/70 backdrop-blur-xl transition hover:bg-white/10 hover:text-white"
+      >
+        <ArrowLeft size={14} />
+        НҮҮР ХУУДАС
+      </button>
+
+      <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{

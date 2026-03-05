@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  LayoutDashboard,
-  User,
-  Settings,
-  LogOut,
-  Globe,
-  Clock,
-  ArrowUpRight,
-  Sparkles,
-} from "lucide-react";
+import { LayoutDashboard, User, MapPin, Building } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { Toaster } from "sonner";
 

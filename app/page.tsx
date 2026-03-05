@@ -7,6 +7,7 @@ import ChronosHeaderBar from "./_component/ChronosHeaderBar";
 
 export default function ChronosPrestige() {
   const { push } = useRouter();
+
   return (
     <div className="min-h-screen w-full bg-[#020203] text-gray-100 font-sans selection:bg-fuchsia-500/30 overflow-x-hidden">
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -94,6 +95,25 @@ export default function ChronosPrestige() {
               specialty="Дизайн"
               slots={["08:00", "12:00", "15:00"]}
               price="$180"
+              active
+            />
+            <WorkerLiquidCard
+              name="Зэлэм"
+              specialty="стратеги"
+              slots={["09:00", "11:00", "14:00"]}
+              price="$150"
+            />
+            <WorkerLiquidCard
+              name="Болорсайхан"
+              specialty="инженерчлэл"
+              slots={["10:00", "13:00", "16:00"]}
+              price="$250"
+            />
+            <WorkerLiquidCard
+              name="Энхсайхан"
+              specialty="инженерчлэл"
+              slots={["10:00", "13:00", "16:00"]}
+              price="$220"
             />
           </div>
         </div>

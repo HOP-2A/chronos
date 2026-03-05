@@ -34,10 +34,10 @@ type CompanyInfo = {
   name: string;
   typeOfCompany: string;
   location: string;
-  openTime: Date | null;
-  closeTime: Date | null;
+  openTime: string;
+  closeTime: string;
   image: string;
-  adminID: string;
+  adminId: string;
   workers: Array<{
     email: string;
     name: string;
@@ -47,6 +47,15 @@ type CompanyInfo = {
   }>;
 };
 
+const days = [
+  { full: "Monday", short: "MON", emoji: "🌅" },
+  { full: "Tuesday", short: "TUE", emoji: "✦" },
+  { full: "Wednesday", short: "WED", emoji: "◈" },
+  { full: "Thursday", short: "THU", emoji: "◇" },
+  { full: "Friday", short: "FRI", emoji: "✺" },
+  { full: "Saturday", short: "SAT", emoji: "◉" },
+  { full: "Sunday", short: "SUN", emoji: "☀" },
+];
 const BG_URL = "";
 
 export default function Page() {
@@ -55,18 +64,18 @@ export default function Page() {
     name: "",
     typeOfCompany: "",
     location: "",
-    openTime: null,
-    closeTime: null,
+    openTime: "",
+    closeTime: "",
     image: "",
-    adminID: "",
+    adminId: "",
     workers: [
       { email: "", name: "", phoneNumber: "", experience: [], feedback: [] },
     ],
   });
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const clerkId = useUser();
 
   const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -77,9 +86,6 @@ export default function Page() {
       return prev;
     });
   };
-  console.log(file);
-
-  // Inside your Page component...
 
   const createCompany = async () => {
     try {
@@ -89,8 +95,9 @@ export default function Page() {
         typeOfCompany: info.typeOfCompany,
         location: info.location,
         image: info.image,
-        openTime: info.openTime ? info.openTime.toISOString() : null,
-        closeTime: info.closeTime ? info.closeTime.toISOString() : null,
+        openTime: info.openTime,
+        closeTime: info.closeTime,
+        adminId: clerkId.user?.id,
       };
 
       const res = await fetch("/api/company", {
@@ -154,16 +161,15 @@ export default function Page() {
   const baseDate = React.useMemo(() => new Date(), []);
 
   const timesInvalid =
-    !!info.openTime && !!info.closeTime && info.closeTime <= info.openTime;
+    info.openTime && info.closeTime && info.closeTime <= info.openTime;
 
   const canSubmit =
     info.name.trim() &&
     info.typeOfCompany.trim() &&
     info.location.trim() &&
-    info.openTime &&
-    info.closeTime &&
+    info.openTime !== "" &&
+    info.closeTime !== "" &&
     !timesInvalid;
-
   return (
     <div className="min-h-screen bg-[#020203] text-gray-100 font-sans selection:bg-fuchsia-500/30 overflow-x-hidden">
       <Toaster theme="dark" position="top-center" />

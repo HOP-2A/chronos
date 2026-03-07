@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   const worker = await prisma.worker.findUnique({
-    where: { id: userId },
+    where: { clerkId: userId },
   });
 
   if (worker) {
@@ -22,7 +22,7 @@ export async function GET() {
   });
 
   if (user) {
-    return NextResponse.json({ role: user.role });
+    return NextResponse.json({ role: "USER", id: user.id });
   }
 
   return NextResponse.json({ role: null });

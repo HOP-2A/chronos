@@ -17,26 +17,29 @@ export type UserType = {
 
 const Page = () => {
   const { push } = useRouter();
-  const { user, isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn } = useUser();
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
 
     const checkUserRole = async () => {
-      const res = await fetch("/api/userCheck");
-      const data = await res.json();
+      try {
+        const res = await fetch("/api/userCheck");
+        const data = await res.json();
 
-      if (data.role === "WORKER") {
-        push(`/dashboard/worker/${user.id}/`);
-      }
-
-      if (data.role === "USER") {
-        push(`/dashboard/user/${user.id}/`);
+        // Redirect based on the role and the database ID returned from your API
+        if (data.role === "WORKER") {
+          push(`/dashboard/worker/${data.id}/`);
+        } else if (data.role === "USER") {
+          push(`/dashboard/user/${data.id}/`);
+        }
+      } catch (error) {
+        console.error("Error checking user role:", error);
       }
     };
 
     checkUserRole();
-  }, [isLoaded, isSignedIn, push, user?.id]);
+  }, [isLoaded, isSignedIn, push]);
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-black text-white">

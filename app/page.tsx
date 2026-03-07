@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { ArrowUpRight, Clock, Clock3, Globe, Sparkles } from "lucide-react";
+import { ArrowUpRight, Globe, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ChronosHeaderBar from "./_component/ChronosHeaderBar";
 
@@ -91,7 +90,7 @@ export default function ChronosPrestige() {
             />
 
             <WorkerLiquidCard
-              name="Турболд"
+              name="Төрболд"
               specialty="Дизайн"
               slots={["08:00", "12:00", "15:00"]}
               price="$180"

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
-
 type CompanyDetails = {
   id: string;
   name: string;

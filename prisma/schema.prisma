@@ -33,9 +33,9 @@ model Worker {
   phoneNumber    String?
   role           Role                @default(WORKER)
   experience     String
-  feedback       String[]
+  feedback       String[]            @default([])
   companyId      String?
-  clerkId        String?             @unique 
+  clerkId        String?             @unique
   profilePicture String?
   appointments   Appointment[]
   timeSchedules  TimeSchedule[]
@@ -59,7 +59,7 @@ model Admin {
   name        String
   email       String    @unique
   phoneNumber String?
-  clerkId     String?   @unique
+  clerkId     String    @unique
   companies   Company[]
 }
 

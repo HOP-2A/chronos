@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { LayoutDashboard, User, MapPin, Building } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { Toaster } from "sonner";
+import { ArrowUpRight, Clock, Sparkles } from "lucide-react";
 
 export type UserType = {
   id: string;

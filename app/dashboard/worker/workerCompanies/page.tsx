@@ -2,8 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Clock, MapPin, Building2, Sparkles, Globe } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {
+  Clock,
+  MapPin,
+  Building2,
+  Sparkles,
+  Globe,
+  ArrowUpRight,
+} from "lucide-react";
 import ChronosHeaderBar from "@/app/_component/ChronosHeaderBar";
 
 type companyType = {

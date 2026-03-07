@@ -2,8 +2,6 @@
 
 import * as React from "react";
 import { ChangeEvent, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Building2,
   MapPin,
@@ -17,18 +15,11 @@ import {
 
 import { upload } from "@vercel/blob/client";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-
 import { TimePicker } from "../_component/TimePicker";
 import { toast, Toaster } from "sonner";
 import { useRouter } from "next/navigation";
 import ChronosHeaderBar from "../_component/ChronosHeaderBar";
+import { useUser } from "@clerk/nextjs";
 
 type CompanyInfo = {
   name: string;
@@ -278,16 +269,31 @@ export default function Page() {
                   <div className="grid grid-cols-2 gap-8">
                     <TimePicker
                       label="Нээх"
-                      value={info.openTime}
-                      onChange={(d) => setInfo((p) => ({ ...p, openTime: d }))}
+                      value={
+                        info.openTime ? new Date(info.openTime) : undefined
+                      }
+                      onChange={(d) =>
+                        setInfo((p) => ({
+                          ...p,
+                          openTime: d ? d.toISOString() : "",
+                        }))
+                      }
                       stepMinutes={15}
                       baseDate={baseDate}
                       use12h={false}
                     />
+
                     <TimePicker
                       label="Хаах"
-                      value={info.closeTime}
-                      onChange={(d) => setInfo((p) => ({ ...p, closeTime: d }))}
+                      value={
+                        info.closeTime ? new Date(info.closeTime) : undefined
+                      }
+                      onChange={(d) =>
+                        setInfo((p) => ({
+                          ...p,
+                          closeTime: d ? d.toISOString() : "",
+                        }))
+                      }
                       stepMinutes={15}
                       baseDate={baseDate}
                       use12h={false}

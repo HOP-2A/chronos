@@ -2,8 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Clock, MapPin, Building2, Sparkles, Globe } from "lucide-react";
+import {
+  Clock,
+  MapPin,
+  Building2,
+  Sparkles,
+  Globe,
+  ArrowUpRight,
+} from "lucide-react";
+<<<<<<< HEAD
 import { Button } from "@/components/ui/button";
+=======
+>>>>>>> 487fa10b45f3a163666cb83014ca29bafca7b1d7
 import ChronosHeaderBar from "@/app/_component/ChronosHeaderBar";
 
 type companyType = {
@@ -120,7 +130,7 @@ const CompaniesPage = () => {
                     </div>
 
                     <div className="space-y-4">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-cent gap-3">
                         <MapPin size={14} className="text-gray-600" />
                         <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
                           {com.location}

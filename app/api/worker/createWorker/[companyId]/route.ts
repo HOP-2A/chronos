@@ -34,12 +34,12 @@ export const POST = async (
     const client = await clerkClient();
     const clerkUser = await client.users.createUser({
       emailAddress: [email],
-      password: password,
+      password,
       skipPasswordChecks: false,
       skipPasswordRequirement: false,
-      publicMetadata: { role: Role.WORKER },
+      publicMetadata: { role: "WORKER" },
     });
-    
+
     const company = await prisma.company.findUnique({
       where: { id: companyId },
     });
@@ -57,7 +57,7 @@ export const POST = async (
         phoneNumber,
         experience,
         clerkId: clerkUser.id,
-        role: Role.WORKER,
+        role: "WORKER",
       },
     });
 
@@ -74,10 +74,19 @@ export const POST = async (
     }
 
     return NextResponse.json({ worker, application });
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    console.error("create worker+application error", error);
     return NextResponse.json(
-      { error: "Failed to create worker + application" },
+      {
+        error: "Failed to create worker + application",
+        debug: {
+          name: error?.name,
+          message: error?.message,
+          code: error?.code,
+          clerkErrors: error?.errors,
+          meta: error?.meta,
+        },
+      },
       { status: 500 },
     );
   }

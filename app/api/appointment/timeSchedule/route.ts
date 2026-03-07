@@ -2,23 +2,49 @@ import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
-  const { companyId, workerId, userId, startAt, endAt } = await req.json();
-  if (!companyId && !userId && !workerId) {
-    return NextResponse.json({
-      error: true,
-      message: " companyId, workerId, userId nuud alga olj ir",
+  try {
+    const { companyId, workerId, userId, startAt, endAt } = await req.json();
+
+    if (!companyId || !workerId || !userId || !startAt || !endAt) {
+      return NextResponse.json(
+        { error: true, message: "Missing fields" },
+        { status: 400 },
+      );
+    }
+
+    /* ✅ Check user exists first */
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
     });
-  } else {
-    const UserGetAppointment = await prisma.appointment.create({
+
+    if (!userExists) {
+      return NextResponse.json(
+        { error: true, message: "User not found" },
+        { status: 400 },
+      );
+    }
+
+    /* ✅ Create appointment */
+    const appointment = await prisma.appointment.create({
       data: {
         companyId,
-        userId,
         workerId,
-        startAt,
-        endAt,
+        userId,
+        startAt: new Date(startAt),
+        endAt: new Date(endAt),
       },
     });
 
-    return NextResponse.json(UserGetAppointment);
+    return NextResponse.json(appointment);
+  } catch (error) {
+    console.error("Appointment error:", error);
+
+    return NextResponse.json(
+      {
+        error: true,
+        message: "Server error",
+      },
+      { status: 500 },
+    );
   }
 };

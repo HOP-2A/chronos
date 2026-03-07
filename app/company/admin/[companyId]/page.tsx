@@ -73,6 +73,22 @@ export default function AdminDashboard() {
     if (companyId) fetchData();
   }, [companyId]);
 
+  const formatHHMM = (v?: string | null) => {
+    if (!v) return "--:--";
+    const s = String(v).trim();
+
+    const m = s.match(/^(\d{1,2}):(\d{2})$/);
+    if (!m) return s; 
+
+    const hh = Number(m[1]);
+    const mm = Number(m[2]);
+
+    if (!Number.isFinite(hh) || !Number.isFinite(mm)) return s;
+    if (hh < 0 || hh > 23 || mm < 0 || mm > 59) return s;
+
+    return `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
+  };
+
   const handleDecision = async (
     applicationId: string,
     decision: "ACCEPT" | "REJECT",
@@ -104,9 +120,8 @@ export default function AdminDashboard() {
           : "Хүсэлтээс татгалзлаа",
       );
 
-      // Update UI state immediately
       setApplications((prev) => prev.filter((app) => app.id !== applicationId));
-      if (decision === "ACCEPT") fetchData(); // Refresh team list
+      if (decision === "ACCEPT") fetchData();
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -128,7 +143,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-zinc-100 selection:bg-fuchsia-500/30">
-      {/* Dynamic Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-fuchsia-600/10 blur-[120px] rounded-full" />
         <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full" />
@@ -159,7 +173,6 @@ export default function AdminDashboard() {
       </header>
 
       <main className="relative max-w-7xl mx-auto px-6 sm:px-12 lg:px-24 py-16 space-y-24">
-        {/* Section: Pending Requests */}
         <section className="space-y-8">
           <div className="flex items-center justify-between border-b border-white/5 pb-4">
             <h2 className="text-xs font-black uppercase tracking-[0.4em] flex items-center gap-3">
@@ -224,7 +237,6 @@ export default function AdminDashboard() {
           )}
         </section>
 
-        {/* Section: Active Team */}
         <section className="space-y-8">
           <div className="flex items-center justify-between border-b border-white/5 pb-4">
             <h2 className="text-xs font-black uppercase tracking-[0.4em] text-zinc-400">
@@ -258,7 +270,6 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {/* Section: Quick Stats/Meta */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-12 border-t border-white/5">
           <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 space-y-3">
             <div className="flex items-center gap-2 text-fuchsia-500">
@@ -268,19 +279,9 @@ export default function AdminDashboard() {
               </label>
             </div>
             <p className="text-2xl font-black italic tracking-tighter">
-              {companyInfo?.openTime
-                ? new Date(companyInfo.openTime).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "--:--"}
+              {formatHHMM(companyInfo?.openTime)}
               <span className="text-zinc-700 mx-2">/</span>
-              {companyInfo?.closeTime
-                ? new Date(companyInfo.closeTime).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "--:--"}
+              {formatHHMM(companyInfo?.closeTime)}
             </p>
           </div>
 

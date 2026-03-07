@@ -6,17 +6,24 @@ import AdminDashboardClient from "./AdminDashboardClient";
 export default async function Page() {
   await requireAdmin();
 
-  const [companyCount, workerCount, userCount, scheduleCount] =
+  // Fetch everything directly from the DB in one parallel block
+  const [companyCount, workerCount, userCount, scheduleCount, recentCompanies] =
     await Promise.all([
       prisma.company.count(),
       prisma.worker.count(),
       prisma.user.count(),
       prisma.timeSchedule.count(),
+      // Replace the fetch call with this:
+      prisma.company.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        select: {
+          id: true,
+          name: true,
+          location: true,
+        },
+      }),
     ]);
-
-  const res = await fetch(`/api/company`);
-  if (!res.ok) throw new Error("failed to fetch /api/company");
-  const recentCompanies = await res.json();
 
   return (
     <AdminDashboardClient

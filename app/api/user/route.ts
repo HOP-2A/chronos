@@ -1,7 +1,22 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export const GET = async () => {
-  const allUsers = await prisma.user.findMany();
-  return NextResponse.json(allUsers);
+export const GET = async (
+  req: Request,
+  context: { params: Promise<{ userId: string }> },
+) => {
+  const { userId } = await context.params;
+  try {
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId },
+      include: { appointments: true },
+    });
+
+    if (!user) {
+      return NextResponse.json("user not found");
+    }
+    return NextResponse.json(user);
+  } catch (err) {
+    return NextResponse.json("server error");
+  }
 };

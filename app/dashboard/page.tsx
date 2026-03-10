@@ -26,7 +26,6 @@ const Page = () => {
       try {
         const res = await fetch("/api/userCheck");
         const data = await res.json();
-
         // Redirect based on the role and the database ID returned from your API
         if (data.role === "WORKER") {
           push(`/dashboard/worker/${data.id}/`);

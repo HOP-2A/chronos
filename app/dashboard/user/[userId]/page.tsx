@@ -32,6 +32,15 @@ export type AppointmentType = {
   companyId: string;
   date: string;
   time: string;
+  company: {
+    id: string;
+    name: string;
+    typeOfCompany: string;
+    location: string;
+    createdAt: Date;
+    openTime: string;
+    closeTime: string;
+  };
 };
 
 const UserPanel = () => {
@@ -43,7 +52,6 @@ const UserPanel = () => {
   const [company, setCompany] = useState<CompanyType[]>([]);
   const [booked, setBooked] = useState<AppointmentType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [companyInfo, setCompanyInfo] = useState(null);
   const getBookedTime = async () => {
     try {
       const res = await fetch(`/api/appointment/bookedTimeGet/${userId}`, {
@@ -56,7 +64,6 @@ const UserPanel = () => {
       console.error("Booked fetch failed", error);
     }
   };
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,7 +90,6 @@ const UserPanel = () => {
     if (userId) {
       fetchData();
       getBookedTime();
-      getCompany();
     }
   }, [userId]);
   console.log(booked);
@@ -193,7 +199,9 @@ const UserPanel = () => {
                     >
                       <h3 className="text-xl font-bold text-white">{b.date}</h3>
 
-                      <p className="text-gray-400 text-sm">Time: {b.time}</p>
+                      <p className="text-gray-400 text-sm">
+                        Company Name: {b?.company.name}
+                      </p>
 
                       <p className="text-gray-500 text-xs">
                         Appointment ID: {b.id}

@@ -10,10 +10,8 @@ import {
   Globe,
   ArrowUpRight,
 } from "lucide-react";
-<<<<<<< HEAD
+
 import { Button } from "@/components/ui/button";
-=======
->>>>>>> 487fa10b45f3a163666cb83014ca29bafca7b1d7
 import ChronosHeaderBar from "@/app/_component/ChronosHeaderBar";
 
 type companyType = {

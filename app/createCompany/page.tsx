@@ -47,7 +47,6 @@ const days = [
   { full: "Saturday", short: "SAT", emoji: "◉" },
   { full: "Sunday", short: "SUN", emoji: "☀" },
 ];
-const BG_URL = "";
 
 export default function Page() {
   const { push } = useRouter();

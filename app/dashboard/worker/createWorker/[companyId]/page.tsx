@@ -40,7 +40,7 @@ export default function CreateWorkerPage() {
       const worker = await res.json();
       push(`/dashboard/worker/${worker.worker.id}`);
     } else {
-      toast.error("Failed to create worker");
+      toast.error("Failed to create worker write strong password");
       return;
     }
   };
@@ -125,6 +125,9 @@ export default function CreateWorkerPage() {
               placeholder="React, Design, Management"
               className="w-full p-3 rounded-lg border border-white/[0.05] bg-white/[0.02] text-gray-200 placeholder:text-gray-700 focus:outline-none focus:ring-1 focus:ring-white/20 transition-all text-sm"
             />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ">
+              write strong password
+            </span>
           </div>
 
           <div>

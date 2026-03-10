@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/db";
 import { clerkClient } from "@clerk/nextjs/server";
-import { Role } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (

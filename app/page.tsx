@@ -82,14 +82,6 @@ export default function ChronosPrestige() {
             />
 
             <WorkerLiquidCard
-              name="Номин"
-              specialty="Инженерчлэл"
-              slots={["10:00", "13:00", "16:00"]}
-              price="$220"
-              highlight
-            />
-
-            <WorkerLiquidCard
               name="Төрболд"
               specialty="Дизайн"
               slots={["08:00", "12:00", "15:00"]}
@@ -144,8 +136,8 @@ export default function ChronosPrestige() {
         />
 
         <div className="flex justify-between items-start mb-12">
-          <div className="w-12 h-12 rounded-full border border-white/10 bg-gradient-to-br from-zinc-800 to-black overflow-hidden flex items-center justify-center">
-            <div className="w-full h-full bg-fuchsia-500/10 animate-pulse" />
+          <div className="w-12 h-12 rounded-full border border-white/50 bg-gradient-to-br from-zinc-800 to-black overflow-hidden flex items-center justify-center">
+            <img src={"pinecone.png"} />
           </div>
           <div className="text-right">
             <p className="text-[8px] font-bold text-gray-600 uppercase tracking-widest mb-1">

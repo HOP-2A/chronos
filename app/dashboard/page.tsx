@@ -1,6 +1,6 @@
 "use client";
 
-import { SignUpButton, useUser } from "@clerk/nextjs";
+import { SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { chronosClerkAppearance } from "../_component/ChronosClerk";
 import { useEffect } from "react";
@@ -26,8 +26,6 @@ const Page = () => {
       try {
         const res = await fetch("/api/userCheck");
         const data = await res.json();
-
-        // Redirect based on the role and the database ID returned from your API
         if (data.role === "WORKER") {
           push(`/dashboard/worker/${data.id}/`);
         } else if (data.role === "USER") {
@@ -163,6 +161,11 @@ const Page = () => {
                   </div>
                 </button>
               </SignUpButton>
+              {!isSignedIn && (
+                <SignInButton mode="modal">
+                  <button>Login</button>
+                </SignInButton>
+              )}
             </div>
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-black/40 p-6 border-t border-white/[0.05]">
               <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-gray-600">

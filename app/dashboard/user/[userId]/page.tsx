@@ -3,7 +3,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Toaster } from "sonner";
-import { ArrowUpRight, Clock, Sparkles } from "lucide-react";
+import {
+  ArrowUpRight,
+  Clock,
+  Sparkles,
+  MapPin,
+  Building2,
+  LayoutGrid,
+} from "lucide-react";
 
 export type UserType = {
   id: string;
@@ -33,7 +40,6 @@ const UserPanel = () => {
 
   const [getUser, setGetUser] = useState<UserType[]>([]);
   const [company, setCompany] = useState<CompanyType[]>([]);
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -60,154 +66,140 @@ const UserPanel = () => {
   }, [userId]);
 
   return (
-    <div className="flex h-screen bg-[#020203] text-gray-100 font-sans selection:bg-fuchsia-500/30 overflow-hidden">
+    <div className="min-h-screen bg-[#020203] text-white font-sans selection:bg-fuchsia-500/30">
       <Toaster theme="dark" position="top-center" />
-      <main className="flex-1 flex flex-col relative overflow-hidden">
-        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-fuchsia-600/5 blur-[120px] rounded-full pointer-events-none" />
-        <nav className="fixed top-0 w-full z-50 border-b border-white/[0.05] bg-black/60 backdrop-blur-2xl px-6 sm:px-12 lg:px-24 py-6 flex items-center justify-between relative">
-          <div
-            className="flex items-center gap-4 group cursor-pointer"
-            onClick={() => push("/")}
-          >
-            <div className="w-10 h-10 bg-gradient-to-tr from-fuchsia-600 to-purple-600 text-white rounded-full flex items-center justify-center transition-transform duration-500 group-hover:rotate-180 shadow-[0_0_20px_rgba(192,38,211,0.3)]">
-              <Clock size={16} strokeWidth={3} />
-            </div>
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-fuchsia-600/5 to-transparent" />
+      </div>
 
-            <span className="text-[20px] font-bold uppercase tracking-[0.5em] text-white">
-              Chronos
+      <nav className="fixed top-0 w-full z-50 border-b border-white/[0.08] bg-black/80 backdrop-blur-md px-8 py-4 flex items-center justify-between">
+        <div
+          className="flex items-center gap-3 cursor-pointer group"
+          onClick={() => push("/")}
+        >
+          <div className="w-10 h-10 bg-gradient-to-tr from-fuchsia-600 to-purple-600 text-white rounded-full flex items-center justify-center transition-transform duration-500 group-hover:rotate-180 shadow-[0_0_20px_rgba(192,38,211,0.3)]">
+            <Clock size={16} strokeWidth={3} />
+          </div>
+
+          <span className="text-lg font-black tracking-[0.2em] text-white uppercase">
+            Chronos
+          </span>
+        </div>
+
+        <button
+          className="px-6 py-3 bg-white text-black text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-fuchsia-500 hover:text-white transition-all active:scale-[0.98]"
+          onClick={() => push("/createCompany")}
+        >
+          БАЙГУУЛЛАГА YYСГЭХ
+        </button>
+      </nav>
+
+      <main className="relative z-10 pt-40 pb-24 max-w-7xl mx-auto px-6">
+        <header className="max-w-3xl mb-20 space-y-4">
+          <div className="flex items-center gap-2 text-fuchsia-500 text-[10px] font-black uppercase tracking-[0.3em]">
+            <Sparkles size={12} /> Network Infrastructure
+          </div>
+          <h1 className="text-9xl md:text-8xl font-black  uppercase ">
+            Компаниас
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-500 via-purple-400 to-indigo-500">
+              цаг захиалах
             </span>
-          </div>
-          <div className="hidden md:flex items-center gap-12">
-            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500 hover:text-fuchsia-500 transition-colors"></div>
+          </h1>
+        </header>
 
-            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500 hover:text-fuchsia-500 transition-colors"></div>
-          </div>
-          <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-fuchsia-500/40 to-transparent animate-pulse" />
-          <button
-            className="px-6 py-3 bg-white text-black text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-fuchsia-500 hover:text-white transition-all active:scale-[0.98]"
-            onClick={() => push("/createCompany")}
-          >
-            БАЙГУУЛЛАГА YYСГЭХ
-          </button>
-        </nav>
-        <section className="flex-1 overflow-y-auto p-8 relative z-10">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.05]">
-              {isLoading
-                ? Array.from({ length: 6 }).map((_, i) => (
-                    <SkeletonCard key={i} />
-                  ))
-                : company.map((a, index) => (
-                    <div
-                      key={index}
-                      className="group relative bg-[#0A0A0A] hover:bg-white/[0.02] transition-all duration-500 p-8 flex flex-col"
-                    >
-                      <div className="absolute top-0 left-0 w-full h-px bg-fuchsia-500/0 group-hover:bg-fuchsia-500/50 transition-all duration-700" />
-
-                      <div className="relative aspect-video w-full overflow-hidden rounded-sm mb-6 border border-white/[0.05]">
-                        {a.image ? (
-                          <img
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            src={a.image}
-                            alt={a.name}
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-[10px] font-bold text-gray-700 uppercase tracking-widest">
-                            No Media
-                          </div>
-                        )}
-                        <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-md border border-white/10 rounded-xs">
-                          <span className="text-[8px] font-bold text-fuchsia-400 uppercase tracking-widest">
-                            {a.typeOfCompany || "Service"}
-                          </span>
-                        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {isLoading
+            ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
+            : company.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => push(`/company/companyDetails/${item.id}`)}
+                  className="group relative bg-zinc-900/20 border border-white/[0.05] hover:border-white/20 transition-all duration-300 cursor-pointer overflow-hidden"
+                >
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-zinc-900 border-b border-white/[0.05]">
+                    {item.image ? (
+                      <img
+                        className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                        src={item.image}
+                        alt={item.name}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Building2 size={24} className="text-zinc-800" />
                       </div>
+                    )}
 
-                      <div className="space-y-4 mb-8">
-                        <h3 className="text-2xl font-bold tracking-tighter text-white uppercase italic group-hover:text-fuchsia-400 transition-colors">
-                          {a.name}
-                        </h3>
-                        <div className="space-y-2">
-                          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                            <span className="w-1 h-1 bg-fuchsia-500 rounded-full" />
-                            {a.location}
-                          </p>
-                          <p className="text-[9px] font-mono text-gray-600 bg-white/[0.03] px-2 py-1 inline-block border border-white/[0.05]">
-                            Working Hours Configured
-                          </p>
-                        </div>
+                    <div className="absolute inset-0 bg-fuchsia-600/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute top-4 right-4 translate-x-2 -translate-y-2 opacity-0 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all">
+                      <div className="bg-white p-2">
+                        <ArrowUpRight size={16} className="text-black" />
                       </div>
-
-                      <button
-                        onClick={() => push(`/company/companyDetails/${a.id}`)}
-                        className="mt-auto w-full py-4 bg-white text-black text-[10px] font-black uppercase tracking-[0.3em] transition-all hover:bg-fuchsia-600 hover:text-white active:scale-[0.98] flex items-center justify-center gap-2"
-                      >
-                        Компани руу очих
-                        <ArrowUpRight size={14} />
-                      </button>
                     </div>
-                  ))}
-            </div>
+                  </div>
 
-            <div className="mt-12 p-12 border border-dashed border-white/10 bg-white/[0.01] flex flex-col items-center justify-center text-center space-y-4">
-              <div className="w-12 h-12 rounded-full bg-white/[0.02] border border-white/10 flex items-center justify-center text-gray-600">
-                <Sparkles size={20} />
-              </div>
-              <p className="text-[10px] font-bold text-gray-600 uppercase tracking-[0.4em]">
-                System Status: Synchronized • ©2026 Chronos
-              </p>
+                  <div className="p-6 space-y-6">
+                    <div>
+                      <span className="text-[9px] font-black text-fuchsia-500 uppercase tracking-[0.2em]">
+                        {item.typeOfCompany || "Industry Service"}
+                      </span>
+                      <h3 className="text-2xl font-bold text-white uppercase tracking-tight mt-1">
+                        {item.name}
+                      </h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3 pt-4 border-t border-white/[0.05]">
+                      <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest">
+                        <span className="text-zinc-600">Location</span>
+                        <span className="text-zinc-300 truncate max-w-[150px]">
+                          {item.location}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-[10px] font-mono tracking-tighter">
+                        <span className="text-zinc-600 uppercase font-sans font-bold tracking-widest">
+                          Hours
+                        </span>
+                        <span className="text-fuchsia-400 bg-fuchsia-500/5 px-2 py-0.5 border border-fuchsia-500/20">
+                          {item.openTime} — {item.closeTime}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+        </div>
+      </main>
+
+      <footer className="py-16 px-8 border-t border-white/[0.05] bg-black/40">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-6">
+            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.4em]">
+              ©2026 Chronos
+            </div>
+            <div className="w-1 h-1 bg-zinc-800 rounded-full" />
+            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.4em]">
+              Node: Stable
             </div>
           </div>
-        </section>
-      </main>
+          <LayoutGrid size={16} className="text-zinc-800" />
+        </div>
+      </footer>
     </div>
   );
 };
 
-function NavItem({
-  icon,
-  label,
-  active = false,
-  isOpen = true,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  active?: boolean;
-  isOpen?: boolean;
-}) {
-  return (
-    <div
-      className={`
-      flex items-center ${isOpen ? "gap-4 px-4" : "justify-center"} py-4 rounded-sm cursor-pointer transition-all duration-300 group
-      ${
-        active
-          ? "text-fuchsia-500 bg-fuchsia-500/[0.03] border-l-2 border-fuchsia-500"
-          : "text-gray-500 hover:text-white hover:bg-white/[0.02] border-l-2 border-transparent"
-      }
-    `}
-    >
-      <div
-        className={`${active ? "text-fuchsia-500" : "group-hover:text-fuchsia-400"} transition-colors`}
-      >
-        {icon}
-      </div>
-      {isOpen && (
-        <span className="text-[11px] font-bold uppercase tracking-[0.2em]">
-          {label}
-        </span>
-      )}
-    </div>
-  );
-}
-
 const SkeletonCard = () => (
-  <div className="bg-[#0A0A0A] p-8 animate-pulse space-y-6">
-    <div className="aspect-video w-full bg-white/5 rounded-sm" />
-    <div className="space-y-3">
-      <div className="h-6 w-3/4 bg-white/5 rounded" />
-      <div className="h-3 w-1/2 bg-white/5 rounded" />
+  <div className="bg-zinc-900/20 border border-white/5 animate-pulse">
+    <div className="aspect-[16/10] w-full bg-zinc-900" />
+    <div className="p-6 space-y-6">
+      <div className="space-y-2">
+        <div className="h-2 w-1/4 bg-zinc-800" />
+        <div className="h-8 w-3/4 bg-zinc-800" />
+      </div>
+      <div className="pt-4 border-t border-white/5 space-y-3">
+        <div className="h-3 w-full bg-zinc-800" />
+        <div className="h-3 w-full bg-zinc-800" />
+      </div>
     </div>
-    <div className="h-12 w-full bg-white/5 rounded" />
   </div>
 );
 

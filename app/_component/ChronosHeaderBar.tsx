@@ -28,7 +28,10 @@ export default function ChronosNavbar() {
           Байгууллагууд
         </button>
 
-        <button className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500 hover:text-fuchsia-500 transition-colors">
+        <button
+          onClick={() => push("problem")}
+          className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500 hover:text-fuchsia-500 transition-colors"
+        >
           Философи
         </button>
       </div>

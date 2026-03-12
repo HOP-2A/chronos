@@ -78,7 +78,7 @@ export default function AdminDashboard() {
     const s = String(v).trim();
 
     const m = s.match(/^(\d{1,2}):(\d{2})$/);
-    if (!m) return s; 
+    if (!m) return s;
 
     const hh = Number(m[1]);
     const mm = Number(m[2]);
@@ -294,18 +294,6 @@ export default function AdminDashboard() {
             </div>
             <p className="text-lg font-bold italic tracking-tight truncate">
               {companyInfo?.location}
-            </p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-gradient-to-br from-fuchsia-600 to-indigo-600 flex flex-col justify-between group cursor-pointer active:scale-95 transition-all">
-            <div className="flex justify-between items-start">
-              <Settings size={20} className="text-white/80" />
-              <span className="text-[10px] font-black text-white/60">
-                EDIT PROFILE
-              </span>
-            </div>
-            <p className="text-xl font-black italic text-white">
-              МЭДЭЭЛЭЛ ЗАСАХ
             </p>
           </div>
         </div>

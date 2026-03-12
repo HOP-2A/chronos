@@ -14,8 +14,6 @@ import {
 } from "lucide-react";
 
 import { upload } from "@vercel/blob/client";
-
-import { TimePicker } from "../_component/TimePicker";
 import { toast, Toaster } from "sonner";
 import { useRouter } from "next/navigation";
 import ChronosHeaderBar from "../_component/ChronosHeaderBar";
@@ -25,8 +23,8 @@ type CompanyInfo = {
   name: string;
   typeOfCompany: string;
   location: string;
-  openTime: string;
-  closeTime: string;
+  openTime: string; // Now stores "HH:mm"
+  closeTime: string; // Now stores "HH:mm"
   image: string;
   adminId: string;
   workers: Array<{
@@ -38,24 +36,14 @@ type CompanyInfo = {
   }>;
 };
 
-const days = [
-  { full: "Monday", short: "MON", emoji: "🌅" },
-  { full: "Tuesday", short: "TUE", emoji: "✦" },
-  { full: "Wednesday", short: "WED", emoji: "◈" },
-  { full: "Thursday", short: "THU", emoji: "◇" },
-  { full: "Friday", short: "FRI", emoji: "✺" },
-  { full: "Saturday", short: "SAT", emoji: "◉" },
-  { full: "Sunday", short: "SUN", emoji: "☀" },
-];
-
 export default function Page() {
   const { push } = useRouter();
   const [info, setInfo] = useState<CompanyInfo>({
     name: "",
     typeOfCompany: "",
     location: "",
-    openTime: "",
-    closeTime: "",
+    openTime: "09:00", // Set default strings
+    closeTime: "18:00",
     image: "",
     adminId: "",
     workers: [
@@ -102,7 +90,6 @@ export default function Page() {
       }
 
       const data = await res.json();
-
       toast.success("Байгууллага амжилттай үүслээ!");
       push(`/company/admin/${data.id}`);
     } catch (err: any) {
@@ -112,44 +99,34 @@ export default function Page() {
       setIsSubmitting(false);
     }
   };
+
   const fetchFile = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
     setFile(selectedFile);
-
     const previewUrl = URL.createObjectURL(selectedFile);
-    setInfo((prev) => ({
-      ...prev,
-      image: previewUrl,
-    }));
+    setInfo((prev) => ({ ...prev, image: previewUrl }));
   };
 
   const uploadPhoto = async () => {
     if (!file) return;
-
     try {
       setUploading(true);
-
       const uploaded = await upload(file.name, file, {
         access: "public",
         handleUploadUrl: "/api/image",
       });
-
-      setInfo((prev) => ({
-        ...prev,
-        image: uploaded.url,
-      }));
+      setInfo((prev) => ({ ...prev, image: uploaded.url }));
       setFile(null);
       toast.success("Photo uploaded successfully");
     } catch (err) {
-      console.error("Upload failed:", err);
       toast.error("Upload failed");
     } finally {
       setUploading(false);
     }
   };
-  const baseDate = React.useMemo(() => new Date(), []);
 
+  // String-based time comparison
   const timesInvalid =
     info.openTime && info.closeTime && info.closeTime <= info.openTime;
 
@@ -160,6 +137,7 @@ export default function Page() {
     info.openTime !== "" &&
     info.closeTime !== "" &&
     !timesInvalid;
+
   return (
     <div className="min-h-screen bg-[#020203] text-gray-100 font-sans selection:bg-fuchsia-500/30 overflow-x-hidden">
       <Toaster theme="dark" position="top-center" />
@@ -168,8 +146,10 @@ export default function Page() {
         <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-purple-600/10 blur-[100px] rounded-full" />
       </div>
       <ChronosHeaderBar />
+
       <div className="relative mx-auto flex min-h-screen max-w-5xl items-center justify-center px-6 py-24">
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+          {/* Left Column */}
           <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-32">
             <div className="inline-flex items-center gap-3">
               <Sparkles size={14} className="text-fuchsia-500" />
@@ -177,18 +157,20 @@ export default function Page() {
                 Бизнес бүртгэл
               </span>
             </div>
-            <h1 className="text-6xl sm:text-7xl font-black tracking-tighter text-white italic leading-[1.25] overflow-visible break-words">
+            <h1 className="text-6xl sm:text-7xl font-black tracking-tighter text-white italic leading-[1.25]">
               ШИНЭ <br />
               <span className="block bg-gradient-to-r from-fuchsia-500 via-purple-400 to-indigo-500 text-transparent bg-clip-text">
-                БАЙГУУЛЛАГА
+                БАЙГУУЛ
+                <br />
+                ЛАГА
               </span>
             </h1>
-
             <p className="text-lg text-gray-400 font-light leading-relaxed border-l border-fuchsia-500/30 pl-6">
               Өөрийн үйлчилгээний дэд бүтцийг үүсгэж, цаг захиалгын ухаалаг
               системд нэгдээрэй.
             </p>
           </div>
+
           <div className="lg:col-span-7 bg-[#0A0A0A] border border-white/[0.05] relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-fuchsia-500/50 to-transparent" />
 
@@ -235,6 +217,8 @@ export default function Page() {
                     </div>
                   </div>
                 </div>
+
+                {/* Photo Upload */}
                 <div className="md:col-span-2 space-y-4">
                   <label className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.3em] text-gray-500">
                     <PlusCircle size={12} /> Нүүр зураг
@@ -255,49 +239,45 @@ export default function Page() {
                     </button>
                   </div>
                 </div>
+
+                {/* Time Selection */}
                 <div className="md:col-span-2 space-y-6 pt-4 border-t border-white/5">
                   <div className="flex items-center justify-between">
                     <label className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.3em] text-gray-500">
                       <Clock size={12} /> Ажиллах цагийн хуваарь
                     </label>
-                    <span className="text-[8px] font-mono text-fuchsia-500 px-2 py-0.5 border border-fuchsia-500/30">
-                      MON-FRI
-                    </span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-8">
-                    <TimePicker
-                      label="Нээх"
-                      value={
-                        info.openTime ? new Date(info.openTime) : undefined
-                      }
-                      onChange={(d) =>
-                        setInfo((p) => ({
-                          ...p,
-                          openTime: d ? d.toISOString() : "",
-                        }))
-                      }
-                      stepMinutes={15}
-                      baseDate={baseDate}
-                      use12h={false}
-                    />
+                    <div className="space-y-2">
+                      <p className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">
+                        Нээх
+                      </p>
+                      <input
+                        type="time"
+                        value={info.openTime}
+                        onChange={(e) =>
+                          setInfo((p) => ({ ...p, openTime: e.target.value }))
+                        }
+                        className="w-full bg-white/[0.02] border border-white/10 p-4 text-sm focus:border-fuchsia-500/50 focus:outline-none transition-all color-scheme-dark"
+                      />
+                    </div>
 
-                    <TimePicker
-                      label="Хаах"
-                      value={
-                        info.closeTime ? new Date(info.closeTime) : undefined
-                      }
-                      onChange={(d) =>
-                        setInfo((p) => ({
-                          ...p,
-                          closeTime: d ? d.toISOString() : "",
-                        }))
-                      }
-                      stepMinutes={15}
-                      baseDate={baseDate}
-                      use12h={false}
-                    />
+                    <div className="space-y-2">
+                      <p className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">
+                        Хаах
+                      </p>
+                      <input
+                        type="time"
+                        value={info.closeTime}
+                        onChange={(e) =>
+                          setInfo((p) => ({ ...p, closeTime: e.target.value }))
+                        }
+                        className="w-full bg-white/[0.02] border border-white/10 p-4 text-sm focus:border-fuchsia-500/50 focus:outline-none transition-all"
+                      />
+                    </div>
                   </div>
+
                   {timesInvalid && (
                     <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest italic animate-pulse">
                       ⚠ Хаах цаг нээх цагаас хойш байх ёстой
@@ -305,6 +285,7 @@ export default function Page() {
                   )}
                 </div>
               </div>
+
               <button
                 onClick={createCompany}
                 disabled={!canSubmit || isSubmitting}

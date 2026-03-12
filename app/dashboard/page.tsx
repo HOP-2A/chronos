@@ -161,11 +161,6 @@ const Page = () => {
                   </div>
                 </button>
               </SignUpButton>
-              {!isSignedIn && (
-                <SignInButton mode="modal">
-                  <button>Login</button>
-                </SignInButton>
-              )}
             </div>
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-black/40 p-6 border-t border-white/[0.05]">
               <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-gray-600">

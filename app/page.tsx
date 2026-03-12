@@ -3,10 +3,32 @@
 import { ArrowUpRight, Globe, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ChronosHeaderBar from "./_component/ChronosHeaderBar";
+import { useUser } from "@clerk/nextjs";
+import { useEffect } from "react";
 
 export default function ChronosPrestige() {
   const { push } = useRouter();
+  const { isSignedIn } = useUser();
 
+  useEffect(() => {
+    if (!isSignedIn) return;
+
+    const checkUserRole = async () => {
+      try {
+        const res = await fetch("/api/userCheck");
+        const data = await res.json();
+        if (data.role === "WORKER") {
+          push(`/dashboard/worker/${data.id}/`);
+        } else if (data.role === "USER") {
+          push(`/dashboard/user/${data.id}/`);
+        }
+      } catch (error) {
+        console.error("Error checking user role:", error);
+      }
+    };
+
+    checkUserRole();
+  }, [isSignedIn, push]);
   return (
     <div className="min-h-screen w-full bg-[#020203] text-gray-100 font-sans selection:bg-fuchsia-500/30 overflow-x-hidden">
       <div className="fixed inset-0 overflow-hidden pointer-events-none">

@@ -13,7 +13,6 @@ import {
   MessageSquare,
   User,
   Settings,
-  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -141,14 +140,7 @@ const Page = () => {
     <div className="w-full min-h-screen bg-black text-zinc-300 font-sans pb-12">
       <div className="w-full h-64 bg-gradient-to-b from-zinc-900 to-black relative border-b border-zinc-800">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
-        <div className="max-w-7xl mx-auto h-full flex items-end pb-12 px-8">
-          <h2 className="text-2xl font-light text-zinc-400">
-            Welcome back,
-            <span className="text-purple-400 font-semibold">
-              {worker?.name}
-            </span>
-          </h2>
-        </div>
+        <div className="max-w-7xl mx-auto h-full flex items-end pb-12 px-8"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 -mt-16">

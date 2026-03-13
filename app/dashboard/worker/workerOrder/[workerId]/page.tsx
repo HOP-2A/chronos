@@ -3,6 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type DayOption =
   | "MONDAY"
@@ -182,7 +183,7 @@ export default function Page() {
     });
 
     if (res.ok) {
-      alert("Booked successfully!");
+      toast.success("Амжилттай захиаллаа!");
       setOpenDialog(false);
       getWorkerSchedule(workerId);
       getAppointments();

@@ -92,22 +92,11 @@ export default function Page() {
               Ажлын цаг
             </label>
             <p className="text-2xl font-light text-white">
-              {companyInfo?.openTime
-                ? new Date(companyInfo.openTime).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "—"}
+              {companyInfo?.openTime}
               <span className="text-gray-700 mx-2">/</span>
-              {companyInfo?.closeTime
-                ? new Date(companyInfo.closeTime).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "—"}
+              {companyInfo?.closeTime}
             </p>
           </div>
-
           <div className="space-y-2">
             <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600">
               Сэтгэгдэл
@@ -142,23 +131,33 @@ export default function Page() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.05]">
-            {companyWorkers.map((worker) => (
-              <div
-                key={worker.id}
-                className="bg-[#0A0A0A] p-6 hover:bg-white/[0.02] transition-colors group"
-                onClick={() =>
-                  push(`/dashboard/worker/workerOrder/${worker.id}`)
-                }
-              >
-                <p className="text-sm font-medium text-white mb-1 group-hover:text-purple-600 transition-colors">
-                  {worker.name}
-                </p>
-                <p className="text-xs text-gray-500 font-mono tracking-tighter">
-                  {worker.experience}
+          <div className="w-full">
+            {companyWorkers.length === 0 ? (
+              <div className="h-48 flex flex-col items-center justify-center border border-dashed border-white/10 bg-white/[0.01]">
+                <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-600 italic">
+                  Бүртгэлтэй ажилтан олдсонгүй
                 </p>
               </div>
-            ))}
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.05] border border-white/[0.05]">
+                {companyWorkers.map((worker) => (
+                  <div
+                    key={worker.id}
+                    className="bg-[#0A0A0A] p-6 hover:bg-white/[0.02] transition-colors group cursor-pointer"
+                    onClick={() =>
+                      push(`/dashboard/worker/workerOrder/${worker.id}`)
+                    }
+                  >
+                    <p className="text-sm font-medium text-white mb-1 group-hover:text-fuchsia-500 transition-colors">
+                      {worker.name}
+                    </p>
+                    <p className="text-xs text-gray-500 font-mono tracking-tighter">
+                      {worker.experience}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       </div>

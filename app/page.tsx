@@ -111,6 +111,12 @@ export default function ChronosPrestige() {
               active
             />
             <WorkerLiquidCard
+              name="Tөрбат"
+              specialty="Захирал"
+              slots={["10:00", "13:00", "16:00"]}
+              price="$300"
+            />
+            <WorkerLiquidCard
               name="Зэлэм"
               specialty="стратеги"
               slots={["09:00", "11:00", "14:00"]}
